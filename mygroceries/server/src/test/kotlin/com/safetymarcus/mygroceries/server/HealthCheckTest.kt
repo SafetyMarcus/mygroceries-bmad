@@ -1,6 +1,7 @@
 package com.mygroceries.server
 
-import kotlin.test.*
+import org.junit.Assert.assertTrue
+import org.junit.Test
 
 class HealthCheckTest {
 
