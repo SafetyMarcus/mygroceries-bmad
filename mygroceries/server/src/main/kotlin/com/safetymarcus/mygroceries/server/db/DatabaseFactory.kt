@@ -12,42 +12,17 @@ import org.postgresql.util.PSQLException
 object DatabaseFactory {
 
     fun init() {
-        createDatabaseIfNotExists()
         val dataSource = hikari()
         Database.connect(dataSource)
         runFlyway(dataSource)
     }
 
-    private fun createDatabaseIfNotExists() {
-        val jdbcUrl = System.getProperty("db.jdbc.url")
-        val username = System.getProperty("db.username")
-        val password = System.getProperty("db.password")
-
-        try {
-            val connection = DriverManager.getConnection(jdbcUrl, username, password)
-            val statement = connection.createStatement()
-            statement.executeUpdate("CREATE DATABASE mygroceries")
-            statement.close()
-            connection.close()
-        } catch (e: PSQLException) {
-            if (e.getSQLState() == "42P04") {
-                println("Database 'mygroceries' already exists.")
-            } else {
-                System.err.println("Error creating database: ${e.message}")
-                throw e
-            }
-        } catch (e: Exception) {
-            System.err.println("Unexpected error creating database: ${e.message}")
-            throw e
-        }
-    }
-
     private fun hikari(): HikariDataSource {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = System.getProperty("db.jdbc.url.with.db") ?: System.getenv("DB_JDBC_URL_WITH_DB") ?: "jdbc:postgresql://localhost:5432/mygroceries"
-        config.username = System.getProperty("db.username") ?: System.getenv("DB_USERNAME") ?: "postgres"
-        config.password = System.getProperty("db.password") ?: System.getenv("DB_PASSWORD") ?: "postgres"
+        config.jdbcUrl = System.getProperty("db.jdbc.url.with.db")
+        config.username = System.getProperty("db.username")
+        config.password = System.getProperty("db.password")
         config.maximumPoolSize = 10
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"

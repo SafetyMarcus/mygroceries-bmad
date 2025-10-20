@@ -1,59 +1,53 @@
 schema: 1
 story: '1.2'
 story_title: 'Database Schema and Connection'
-gate: CONCERNS
-status_reason: 'The core database setup and migration functionality are implemented, but test coverage is insufficient, particularly for migration application and schema validation. Hardcoded database credentials also pose a security risk.'
+gate: PASS
+status_reason: 'Significant improvements in security and configuration management. Remaining issues are minor test-related improvements.'
 reviewer: 'Quinn (Test Architect)'
-updated: '2025-10-20T00:00:00Z'
+updated: '2025-10-20T14:02:47Z'
 top_issues:
-  - id: 'TEST-001'
-    severity: high
-    finding: 'Lack of integration tests to verify schema creation and basic data persistence as per AC 5. The existing DatabaseFactoryTest is insufficient.'
-    suggested_action: 'Implement integration tests that connect to a test PostgreSQL instance (e.g., using Testcontainers) and verify that Flyway migrations create the expected schema and that basic data operations work.'
-    suggested_owner: 'dev'
-  - id: 'SEC-001'
+  - action: 'Remove or refactor DatabaseFactoryTest.kt as its current implementation is redundant given the DatabaseIntegrationTest.kt.'
     severity: medium
-    finding: 'Hardcoded PostgreSQL username and password in DatabaseFactory.kt.'
-    suggested_action: 'Externalize database credentials using environment variables or a secure configuration management system.'
-    suggested_owner: 'dev'
-  - id: 'TEST-002'
+    suggested_owner: dev
+  - action: 'Replace placeholder HealthCheckTest.kt with a meaningful integration test for the /health endpoint.'
     severity: medium
-    finding: 'DatabaseFactoryTest.kt uses an in-memory H2 database, which does not accurately reflect the production PostgreSQL environment.'
-    suggested_action: 'Update DatabaseFactoryTest.kt to use a test PostgreSQL instance (e.g., with Testcontainers) or add a separate integration test suite for PostgreSQL-specific behaviors.'
-    suggested_owner: 'dev'
-  - id: 'MNT-001'
+    suggested_owner: dev
+  - action: 'Consider adding documentation on how to provision the database, since createDatabaseIfNotExists() has been removed.'
     severity: low
-    finding: 'Broad exception catching in createDatabaseIfNotExists() can mask other issues.'
-    suggested_action: 'Refine exception handling to specifically catch "database already exists" errors and log other exceptions.'
-    suggested_owner: 'dev'
+    suggested_owner: dev
 waiver: { active: false }
-quality_score: 60
-expires: '2025-11-03T00:00:00Z'
+
+quality_score: 80
+
+expires: '2025-11-03T14:02:47Z'
+
 evidence:
-  tests_reviewed: 2
-  risks_identified: 4
+  tests_reviewed: 3
+  risks_identified: 3
   trace:
     ac_covered: [1, 2, 3, 4, 5]
     ac_gaps: []
+
 nfr_validation:
   security:
-    status: CONCERNS
-    notes: 'Hardcoded database credentials.'
+    status: PASS
+    notes: 'The removal of fallback credentials in DatabaseFactory.kt eliminates the previous security concern. The application now explicitly requires database credentials via system properties.'
   performance:
     status: PASS
-    notes: 'HikariCP used for connection pooling.'
+    notes: 'HikariCP used for connection pooling is a good practice.'
   reliability:
-    status: CONCERNS
-    notes: 'Broad exception handling in database creation.'
-  maintainability:
     status: PASS
-    notes: 'Code is generally clear, but testability of DatabaseFactory could be improved.'
+    notes: 'Core database setup is well-covered by integration tests.'
+  maintainability:
+    status: CONCERNS
+    notes: 'Redundant test files and a placeholder test reduce overall maintainability of the test suite.'
+
 recommendations:
-  immediate:
-    - action: 'Implement integration tests for schema creation and data persistence.'
-      refs: ['mygroceries/server/src/test/kotlin/com/safetymarcus/mygroceries/server/db/']
-    - action: 'Externalize database credentials.'
-      refs: ['mygroceries/server/src/main/kotlin/com/safetymarcus/mygroceries/server/db/DatabaseFactory.kt']
+  immediate: []
   future:
-    - action: 'Refine exception handling in `createDatabaseIfNotExists()`.'
-      refs: ['mygroceries/server/src/main/kotlin/com/safetymarcus/mygroceries/server/db/DatabaseFactory.kt']
+    - action: 'Remove or refactor DatabaseFactoryTest.kt as its current implementation is redundant given the DatabaseIntegrationTest.kt.'
+      refs: ['mygroceries/server/src/test/kotlin/com/safetymarcus/mygroceries/server/db/DatabaseFactoryTest.kt']
+    - action: 'Replace placeholder HealthCheckTest.kt with a meaningful integration test for the /health endpoint.'
+      refs: ['mygroceries/server/src/test/kotlin/com/safetymarcus/mygroceries/server/HealthCheckTest.kt']
+    - action: 'Consider adding documentation on how to provision the database, since createDatabaseIfNotExists() has been removed.'
+      refs: ['docs/architecture/7-database-schema.md']
