@@ -2,4 +2,4 @@
 */.gradle*
 */.kotlin*
 .idea/*
-local.properties
+mygroceries/local.properties
