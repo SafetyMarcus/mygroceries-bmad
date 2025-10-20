@@ -1,4 +1,4 @@
-package com.mygroceries.server
+package com.safetymarcus.mygroceries.server
 
 import com.safetymarcus.mygroceries.server.db.DatabaseFactory
 import io.ktor.server.application.*
