@@ -1,0 +1,8 @@
+schema: 1
+story: '1.1'
+gate: PASS
+status_reason: 'Project scaffolding and core dependencies are successfully set up and verified across all target platforms.'
+reviewer: 'Quinn'
+updated: '2025-10-20T12:00:00Z'
+top_issues: []
+waiver: { active: false }
