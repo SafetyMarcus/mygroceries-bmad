@@ -30,9 +30,9 @@ class DatabaseIntegrationTest {
     fun setup() {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = System.getenv("DB_JDBC_URL_WITH_DB") ?: "jdbc:postgresql://localhost:5432/mygroceries"
-        config.username = System.getenv("DB_USERNAME") ?: "marcushooper"
-        config.password = System.getenv("DB_PASSWORD") ?: ""
+        config.jdbcUrl = System.getProperty("db.jdbc.url.with.db")
+        config.username = System.getProperty("db.username")
+        config.password = System.getProperty("db.password")
         config.maximumPoolSize = 10
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"

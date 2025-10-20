@@ -19,9 +19,9 @@ object DatabaseFactory {
     }
 
     private fun createDatabaseIfNotExists() {
-        val jdbcUrl = System.getenv("DB_JDBC_URL") ?: "jdbc:postgresql://localhost:5432/"
-        val username = System.getenv("DB_USERNAME") ?: "marcushooper"
-        val password = System.getenv("DB_PASSWORD") ?: ""
+        val jdbcUrl = System.getProperty("db.jdbc.url")
+        val username = System.getProperty("db.username")
+        val password = System.getProperty("db.password")
 
         try {
             val connection = DriverManager.getConnection(jdbcUrl, username, password)
@@ -45,9 +45,9 @@ object DatabaseFactory {
     private fun hikari(): HikariDataSource {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
-        config.jdbcUrl = System.getenv("DB_JDBC_URL_WITH_DB") ?: "jdbc:postgresql://localhost:5432/mygroceries"
-        config.username = System.getenv("DB_USERNAME") ?: "postgres"
-        config.password = System.getenv("DB_PASSWORD") ?: "postgres"
+        config.jdbcUrl = System.getProperty("db.jdbc.url.with.db") ?: System.getenv("DB_JDBC_URL_WITH_DB") ?: "jdbc:postgresql://localhost:5432/mygroceries"
+        config.username = System.getProperty("db.username") ?: System.getenv("DB_USERNAME") ?: "postgres"
+        config.password = System.getProperty("db.password") ?: System.getenv("DB_PASSWORD") ?: "postgres"
         config.maximumPoolSize = 10
         config.isAutoCommit = false
         config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
