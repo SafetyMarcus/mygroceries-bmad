@@ -13,4 +13,10 @@ object TestDatabaseFactory {
             SchemaUtils.create(Categories)
         }
     }
+
+    fun close() {
+        transaction {
+            SchemaUtils.drop(Categories)
+        }
+    }
 }
