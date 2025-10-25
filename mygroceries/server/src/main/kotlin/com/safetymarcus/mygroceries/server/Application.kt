@@ -1,6 +1,10 @@
 package com.safetymarcus.mygroceries.server
 
 import com.safetymarcus.mygroceries.server.db.DatabaseFactory
+import com.safetymarcus.mygroceries.routes.*
+import com.safetymarcus.mygroceries.db.CategoryRepository
+import com.safetymarcus.mygroceries.service.CategoryService
+import com.safetymarcus.mygroceries.service.CategoryValidator
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.Application
@@ -28,9 +32,16 @@ fun Application.configureDatabases() {
 
 fun Application.module() {
     configureDatabases()
+    categories()
     routing {
         get("/health") {
             call.respondText("OK")
         }
+    }
+}
+
+fun Application.categories() {
+    routing {
+        categoryRoutes(CategoryService(CategoryRepository(), CategoryValidator()))
     }
 }

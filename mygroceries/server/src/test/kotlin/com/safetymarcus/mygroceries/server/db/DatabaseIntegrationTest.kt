@@ -55,8 +55,6 @@ class DatabaseIntegrationTest {
 
     @AfterEach
     fun tearDown() {
-        // Clean up the database after each test if necessary, or rely on Flyway clean/migrate for next test
-        // For now, we'll just close the data source.
         dataSource.close()
     }
 

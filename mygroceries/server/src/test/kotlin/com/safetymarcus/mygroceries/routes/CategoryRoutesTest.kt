@@ -1,20 +1,21 @@
 package com.safetymarcus.mygroceries.routes
 
+import com.safetymarcus.mygroceries.server.module
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.db.TestDatabaseFactory
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.service.CategoryService
 import com.safetymarcus.mygroceries.service.CategoryValidator
 import com.safetymarcus.mygroceries.routes.categoryRoutes
-import io.ktor.client.* 
 import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.HttpClient
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation as ServerContentNegotiation
-import io.ktor.server.routing.*
 import io.ktor.server.testing.*
+import kotlin.test.*
+import io.ktor.server.application.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,19 +38,14 @@ class CategoryRoutesTest {
         application {
             module()
         }
+        val client = createClient {
+            install(ContentNegotiation) {
+                json()
+            }
+        }
         test(client)
     }
 
-    @Test
-    fun `simple test to check setup`() = testApplication {
-        application {
-            module()
-        }
-        val response = client.get("/health")
-        assertEquals(HttpStatusCode.OK, response.status)
-    }
-
-/*
     @Test
     fun `test create category`() = withTestApplication { client ->
         val response = client.post("/categories") {
@@ -166,19 +162,5 @@ class CategoryRoutesTest {
             setBody(Category(id = createdCategory.id, name = ""))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
-    }
-*/
-}
-
-fun Application.module() {
-    val categoryRepository = CategoryRepository()
-    val categoryValidator = CategoryValidator()
-    val categoryService = CategoryService(categoryRepository, categoryValidator)
-
-    install(ServerContentNegotiation) {
-        json()
-    }
-    routing {
-        categoryRoutes(categoryService)
     }
 }

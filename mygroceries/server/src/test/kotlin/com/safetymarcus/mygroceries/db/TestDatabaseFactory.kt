@@ -15,8 +15,6 @@ object TestDatabaseFactory {
     }
 
     fun close() {
-        transaction {
-            SchemaUtils.drop(Categories)
-        }
+        //Do nothing for now
     }
 }
