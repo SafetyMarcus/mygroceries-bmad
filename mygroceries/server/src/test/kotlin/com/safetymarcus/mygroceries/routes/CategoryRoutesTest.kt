@@ -1,3 +1,5 @@
+package com.safetymarcus.mygroceries.routes
+
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.db.TestDatabaseFactory
 import com.safetymarcus.mygroceries.model.Category
@@ -6,7 +8,6 @@ import com.safetymarcus.mygroceries.service.CategoryValidator
 import com.safetymarcus.mygroceries.routes.categoryRoutes
 import io.ktor.client.* 
 import io.ktor.client.call.*
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -36,19 +37,16 @@ class CategoryRoutesTest {
         application {
             module()
         }
-        val client = createClient {
-            install(ContentNegotiation) {
-                json()
-            }
-        }
         test(client)
     }
 
     @Test
-    fun `simple test to check setup`() = withTestApplication { client ->
-        // This test does nothing but check if the application starts without NoClassDefFoundError
-        val response = client.get("/")
-        assertEquals(HttpStatusCode.NotFound, response.status) // Expecting 404 as no route is defined for /
+    fun `simple test to check setup`() = testApplication {
+        application {
+            module()
+        }
+        val response = client.get("/health")
+        assertEquals(HttpStatusCode.OK, response.status)
     }
 
 /*

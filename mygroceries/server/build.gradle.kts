@@ -11,10 +11,10 @@ repositories {
 
 dependencies {
     implementation(project(":shared"))
-    implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.ktor:ktor-server-netty-jvm")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
+    implementation("io.ktor:ktor-server-core-jvm:3.3.1")
+    implementation("io.ktor:ktor-server-netty-jvm:3.3.1")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:3.3.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:3.3.1")
     implementation("ch.qos.logback:logback-classic:1.4.11")
 
     // Exposed for database access
@@ -36,15 +36,13 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.10")
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
-    testImplementation("io.ktor:ktor-server-tests-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("io.ktor:ktor-client-content-negotiation")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:3.3.1")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("com.h2database:h2:2.2.224")
     testImplementation("org.jetbrains.exposed:exposed-core:0.49.0")
     testImplementation("org.jetbrains.exposed:exposed-dao:0.49.0")
     testImplementation("org.jetbrains.exposed:exposed-jdbc:0.49.0")
     testImplementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.49.0")
-    testImplementation(sourceSets.main.get().output)
     testImplementation(project(":server"))
 }
 
@@ -69,15 +67,19 @@ tasks.withType<JavaExec> {
 }
 
 tasks.named<Test>("test") {
+
     useJUnitPlatform()
+
     testLogging {
+
         showStandardStreams = true
+
     }
+
     classpath += files(sourceSets.main.get().output.classesDirs, sourceSets.main.get().output.resourcesDir)
+
 }
 
 configurations.testRuntimeClasspath {
-    extendsFrom(configurations.runtimeClasspath.get())
-    files(sourceSets.main.get().output.classesDirs)
-    files(sourceSets.main.get().output.resourcesDir)
+    extendsFrom(configurations.implementation.get(), configurations.testImplementation.get())
 }

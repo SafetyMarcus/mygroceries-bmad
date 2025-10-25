@@ -10,11 +10,11 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import java.util.UUID
 
 object TestTable : Table("test_table") {
@@ -33,7 +33,7 @@ class DatabaseIntegrationTest {
 
     private lateinit var dataSource: HikariDataSource
 
-    @Before
+    @BeforeEach
     fun setup() {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
@@ -53,7 +53,7 @@ class DatabaseIntegrationTest {
         Database.connect(dataSource)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         // Clean up the database after each test if necessary, or rely on Flyway clean/migrate for next test
         // For now, we'll just close the data source.
@@ -112,7 +112,7 @@ class DatabaseIntegrationTest {
             // Retrieve the category by UUID
             val retrievedCategory = Categories.selectAll().where { Categories.id eq testUuid }.singleOrNull()
 
-            assertTrue("Retrieved category should not be null", retrievedCategory != null)
+            assertTrue(retrievedCategory != null, "Retrieved category should not be null")
             assertEquals(testUuid, retrievedCategory?.get(Categories.id))
             assertEquals(categoryName, retrievedCategory?.get(Categories.name))
         }
