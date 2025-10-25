@@ -15,9 +15,16 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
+import java.util.UUID
 
 object TestTable : Table("test_table") {
     val id = integer("id").autoIncrement()
+    val name = varchar("name", 255)
+    override val primaryKey = PrimaryKey(id)
+}
+
+object Categories : Table("categories") {
+    val id = uuid("id")
     val name = varchar("name", 255)
     override val primaryKey = PrimaryKey(id)
 }
@@ -85,6 +92,29 @@ class DatabaseIntegrationTest {
             val result = TestTable.selectAll().where { TestTable.id eq insertedId }.single()
 
             assertEquals("Test Item", result[TestTable.name])
+        }
+    }
+
+    @Test
+    fun `category table handles UUID primary keys correctly`() {
+        transaction {
+            SchemaUtils.create(Categories) // Ensure the Categories table is created for this test
+
+            val testUuid = UUID.randomUUID()
+            val categoryName = "Test Category UUID"
+
+            // Insert a new category with a UUID
+            Categories.insert {
+                it[id] = testUuid
+                it[name] = categoryName
+            }
+
+            // Retrieve the category by UUID
+            val retrievedCategory = Categories.selectAll().where { Categories.id eq testUuid }.singleOrNull()
+
+            assertTrue("Retrieved category should not be null", retrievedCategory != null)
+            assertEquals(testUuid, retrievedCategory?.get(Categories.id))
+            assertEquals(categoryName, retrievedCategory?.get(Categories.name))
         }
     }
 }
