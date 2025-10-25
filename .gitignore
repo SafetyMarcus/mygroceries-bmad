@@ -1,5 +1,9 @@
-*build*
 */.gradle*
 */.kotlin*
 .idea/*
 *local.properties
+mygroceries/build/*
+mygroceries/server/build/*
+mygroceries/shared/build/*
+mygroceries/web/build/*
+mygroceries/androidApp/build/*
