@@ -4,10 +4,13 @@ import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.model.Category
 import java.util.UUID
 
-class CategoryService(private val categoryRepository: CategoryRepository) {
+class CategoryService(
+    private val categoryRepository: CategoryRepository,
+    private val categoryValidator: CategoryValidator
+) {
 
     fun create(category: Category): Category {
-        validateCategory(category)
+        categoryValidator.validateCategory(category)
         val newCategory = category.copy(id = UUID.randomUUID().toString())
         return categoryRepository.create(newCategory)
     }
@@ -17,13 +20,13 @@ class CategoryService(private val categoryRepository: CategoryRepository) {
     }
 
     fun readById(id: String): Category? {
-        validateUuid(id)
+        categoryValidator.validateUuid(id)
         return categoryRepository.readById(id)
     }
 
     fun update(id: String, category: Category): Category? {
-        validateUuid(id)
-        validateCategory(category)
+        categoryValidator.validateUuid(id)
+        categoryValidator.validateCategory(category)
         val updatedRows = categoryRepository.update(id, category)
         return if (updatedRows > 0) {
             categoryRepository.readById(id)
@@ -33,21 +36,7 @@ class CategoryService(private val categoryRepository: CategoryRepository) {
     }
 
     fun delete(id: String): Boolean {
-        validateUuid(id)
+        categoryValidator.validateUuid(id)
         return categoryRepository.delete(id) > 0
-    }
-
-    private fun validateCategory(category: Category) {
-        if (category.name.isBlank()) {
-            throw IllegalArgumentException("Category name cannot be empty.")
-        }
-    }
-
-    private fun validateUuid(id: String) {
-        try {
-            UUID.fromString(id)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Invalid UUID format for id.")
-        }
     }
 }

@@ -4,7 +4,7 @@ import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.model.Category
 import io.mockk.coEvery
 import io.mockk.mockk
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -12,7 +12,8 @@ import kotlin.test.assertFailsWith
 class CategoryServiceTest {
 
     private val categoryRepository = mockk<CategoryRepository>()
-    private val categoryService = CategoryService(categoryRepository)
+    private val categoryValidator = CategoryValidator() // Use real validator for unit tests
+    private val categoryService = CategoryService(categoryRepository, categoryValidator)
 
     @Test
     fun `create category with valid data`() {
