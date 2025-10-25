@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.util.UUID
 
 fun Route.categoryRoutes(categoryService: CategoryService) {
 
@@ -24,18 +25,14 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
 
         get("/{id}") {
             val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing id")
-            val category = categoryService.readById(id)
-            if (category != null) {
-                call.respond(category)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+            val category = categoryService.readById(UUID.fromString(id)) ?: return@get call.respond(HttpStatusCode.NotFound)
+            call.respond(category)
         }
 
         put("/{id}") {
             val id = call.parameters["id"] ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing id")
             val category = call.receive<Category>()
-            val updatedCategory = categoryService.update(id, category)
+            val updatedCategory = categoryService.update(UUID.fromString(id), category)
             if (updatedCategory != null) {
                 call.respond(updatedCategory)
             } else {
@@ -45,7 +42,7 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
 
         delete("/{id}") {
             val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing id")
-            val deleted = categoryService.delete(id)
+            val deleted = categoryService.delete(UUID.fromString(id))
             if (deleted) {
                 call.respond(HttpStatusCode.NoContent)
             } else {

@@ -1,12 +1,13 @@
 package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Category
+import java.util.UUID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object Categories : Table() {
-    val id = varchar("id", 36)
+    val id = uuid("id")
     val name = varchar("name", 255)
     override val primaryKey = PrimaryKey(id)
 }
@@ -28,7 +29,7 @@ class CategoryRepository {
         }
     }
 
-    fun readById(id: String): Category? {
+    fun readById(id: UUID): Category? {
         return transaction {
             Categories.select { Categories.id eq id }
                 .mapNotNull { toCategory(it) }
@@ -36,7 +37,7 @@ class CategoryRepository {
         }
     }
 
-    fun update(id: String, category: Category): Int {
+    fun update(id: UUID, category: Category): Int {
         return transaction {
             Categories.update({ Categories.id eq id }) {
                 it[name] = category.name
@@ -44,7 +45,7 @@ class CategoryRepository {
         }
     }
 
-    fun delete(id: String): Int {
+    fun delete(id: UUID): Int {
         return transaction {
             Categories.deleteWhere { Categories.id eq id }
         }

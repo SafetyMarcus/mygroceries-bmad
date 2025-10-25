@@ -16,6 +16,13 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
+import io.ktor.server.util.getValue
 import org.jetbrains.exposed.sql.Database
 
 fun main() {
@@ -32,6 +39,12 @@ fun Application.configureDatabases() {
 
 fun Application.module() {
     configureDatabases()
+    install(ContentNegotiation) {
+        json(Json {
+            prettyPrint = true
+            isLenient = true
+        })
+    }
     categories()
     routing {
         get("/health") {

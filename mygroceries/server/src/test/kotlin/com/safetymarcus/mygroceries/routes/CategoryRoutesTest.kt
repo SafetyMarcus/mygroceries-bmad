@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import java.util.UUID
 
 class CategoryRoutesTest {
 
@@ -47,10 +48,10 @@ class CategoryRoutesTest {
     }
 
     @Test
-    fun `test create category`() = withTestApplication { client ->
+    fun `Create a category`() = withTestApplication { client ->
         val response = client.post("/categories") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = "", name = "Fruits"))
+            setBody(Category(id = UUID.randomUUID(), name = "Fruits"))
         }
         assertEquals(HttpStatusCode.Created, response.status)
         val createdCategory = response.body<Category>()
@@ -64,7 +65,7 @@ class CategoryRoutesTest {
         val categoryRepository = CategoryRepository()
         val categoryValidator = CategoryValidator()
         val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = "", name = "Fruits"))
+        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
 
         val response = client.get("/categories")
         assertEquals(HttpStatusCode.OK, response.status)
@@ -79,7 +80,7 @@ class CategoryRoutesTest {
         val categoryRepository = CategoryRepository()
         val categoryValidator = CategoryValidator()
         val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = "", name = "Fruits"))
+        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
 
         val response = client.get("/categories/${createdCategory.id}")
         assertEquals(HttpStatusCode.OK, response.status)
@@ -93,7 +94,7 @@ class CategoryRoutesTest {
         val categoryRepository = CategoryRepository()
         val categoryValidator = CategoryValidator()
         val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = "", name = "Fruits"))
+        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
 
         val response = client.put("/categories/${createdCategory.id}") {
             contentType(ContentType.Application.Json)
@@ -110,7 +111,7 @@ class CategoryRoutesTest {
         val categoryRepository = CategoryRepository()
         val categoryValidator = CategoryValidator()
         val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = "", name = "Fruits"))
+        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
 
         val deleteResponse = client.delete("/categories/${createdCategory.id}")
         assertEquals(HttpStatusCode.NoContent, deleteResponse.status)
@@ -129,7 +130,7 @@ class CategoryRoutesTest {
     fun `test update category with invalid id returns bad request`() = withTestApplication { client ->
         val response = client.put("/categories/invalid-uuid") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = "", name = "Vegetables"))
+            setBody(Category(id = UUID.randomUUID(), name = "Vegetables"))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
@@ -144,7 +145,7 @@ class CategoryRoutesTest {
     fun `test create category with empty name returns bad request`() = withTestApplication { client ->
         val response = client.post("/categories") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = "", name = ""))
+            setBody(Category(id = UUID.randomUUID(), name = ""))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
@@ -155,7 +156,7 @@ class CategoryRoutesTest {
         val categoryRepository = CategoryRepository()
         val categoryValidator = CategoryValidator()
         val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = "", name = "Fruits"))
+        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
 
         val response = client.put("/categories/${createdCategory.id}") {
             contentType(ContentType.Application.Json)

@@ -11,7 +11,7 @@ class CategoryService(
 
     fun create(category: Category): Category {
         categoryValidator.validateCategory(category)
-        val newCategory = category.copy(id = UUID.randomUUID().toString())
+        val newCategory = category.copy(id = UUID.randomUUID())
         return categoryRepository.create(newCategory)
     }
 
@@ -19,13 +19,11 @@ class CategoryService(
         return categoryRepository.readAll()
     }
 
-    fun readById(id: String): Category? {
-        categoryValidator.validateUuid(id)
+    fun readById(id: UUID): Category? {
         return categoryRepository.readById(id)
     }
 
-    fun update(id: String, category: Category): Category? {
-        categoryValidator.validateUuid(id)
+    fun update(id: UUID, category: Category): Category? {
         categoryValidator.validateCategory(category)
         val updatedRows = categoryRepository.update(id, category)
         return if (updatedRows > 0) {
@@ -35,8 +33,7 @@ class CategoryService(
         }
     }
 
-    fun delete(id: String): Boolean {
-        categoryValidator.validateUuid(id)
+    fun delete(id: UUID): Boolean {
         return categoryRepository.delete(id) > 0
     }
 }
