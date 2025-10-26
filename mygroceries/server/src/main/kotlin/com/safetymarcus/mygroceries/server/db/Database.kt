@@ -10,10 +10,17 @@ import java.sql.DriverManager
 import org.postgresql.util.PSQLException
 
 object Database {
+    private var dataSource: HikariDataSource? = null
 
     fun init() = hikari().let {
+        dataSource = it
         Database.connect(it)
         runFlyway(it)
+    }
+
+    fun close() {
+        dataSource?.close()
+        dataSource = null
     }
 
     private fun hikari() = HikariDataSource(HikariConfig().apply {

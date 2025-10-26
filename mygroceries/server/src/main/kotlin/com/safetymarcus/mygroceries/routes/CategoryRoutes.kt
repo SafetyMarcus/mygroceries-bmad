@@ -25,29 +25,37 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
         }
 
         get("/{id}") {
-            val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing id")
-            val category = categoryService.readById(UUID.fromString(id)) ?: return@get call.respond(HttpStatusCode.NotFound)
+            val id = call.getAndValidateUUID("id")
+            val category = categoryService.readById(id) ?: return@get call.respond(HttpStatusCode.NotFound)
             call.respond(category)
         }
 
         put("/{id}") {
+            val id = call.getAndValidateUUID("id")
             val category = call.receive<Category>()
-            val updatedCategory = categoryService.update(category)
-            if (updatedCategory != null) {
-                call.respond(updatedCategory)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
+            if (category.id != id) {
+                call.respond(HttpStatusCode.BadRequest, "Category id does not match path id")
+                return@put
             }
+
+            val updatedCategory = categoryService.update(category)
+            updatedCategory?.let { call.respond(it) } ?: call.respond(HttpStatusCode.NotFound)
         }
 
         delete("/{id}") {
-            val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest, "Missing id")
-            val deleted = categoryService.delete(UUID.fromString(id))
-            if (deleted) {
-                call.respond(HttpStatusCode.NoContent)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+            val id = call.getAndValidateUUID("id")
+            if (categoryService.delete(id)) call.respond(HttpStatusCode.NoContent)
+            else call.respond(HttpStatusCode.NotFound)
         }
+    }
+}
+
+suspend fun ApplicationCall.getAndValidateUUID(name: String): UUID {
+    val param = parameters[name]?.toString()
+    return try {
+        UUID.fromString(param) 
+    } catch (e: Exception) {
+        respond(HttpStatusCode.BadRequest, "Invalid UUID: $param") 
+        throw e
     }
 }

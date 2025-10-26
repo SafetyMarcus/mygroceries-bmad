@@ -1,6 +1,7 @@
 package com.safetymarcus.mygroceries.routes
 
 import com.safetymarcus.mygroceries.server.module
+import com.safetymarcus.mygroceries.server.db.Database
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import java.util.UUID
+
+
 
 class CategoryRoutesTest {
 
@@ -44,6 +47,7 @@ class CategoryRoutesTest {
     @AfterTest
     fun tearDown() {
         CategoryRepository.deleteAll()
+        Database.close()
     }
 
     @Test
@@ -103,7 +107,7 @@ class CategoryRoutesTest {
 
     @Test
     fun `Update category with invalid id returns bad request`() = withTestApplication { client ->
-        val response = client.put("/categories") {
+        val response = client.put("/categories/invalid-uuid") {
             contentType(ContentType.Application.Json)
             setBody(NewCategory(name = "Vegetables"))
         }
@@ -112,7 +116,7 @@ class CategoryRoutesTest {
 
     @Test
     fun `Delete category with invalid id returns bad request`() = withTestApplication { client ->
-        val response = client.delete("/categories")
+        val response = client.delete("/categories/invalid-uuid")
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
