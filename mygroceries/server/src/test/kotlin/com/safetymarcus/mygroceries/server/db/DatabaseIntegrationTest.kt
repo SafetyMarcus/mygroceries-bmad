@@ -10,14 +10,21 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import java.util.UUID
 
 object TestTable : Table("test_table") {
     val id = integer("id").autoIncrement()
+    val name = varchar("name", 255)
+    override val primaryKey = PrimaryKey(id)
+}
+
+object Categories : Table("categories") {
+    val id = uuid("id")
     val name = varchar("name", 255)
     override val primaryKey = PrimaryKey(id)
 }
@@ -26,7 +33,7 @@ class DatabaseIntegrationTest {
 
     private lateinit var dataSource: HikariDataSource
 
-    @Before
+    @BeforeEach
     fun setup() {
         val config = HikariConfig()
         config.driverClassName = "org.postgresql.Driver"
@@ -46,10 +53,25 @@ class DatabaseIntegrationTest {
         Database.connect(dataSource)
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
-        // Clean up the database after each test if necessary, or rely on Flyway clean/migrate for next test
-        // For now, we'll just close the data source.
+        transaction {
+            // List of known tables that need to be cleaned up
+            val tablesToClean = listOf(
+                "test_table",  // Test table used only in this test
+                "categories",
+                "products",
+                "orders",
+                "line_items"
+            )
+            
+            // Truncate each table with CASCADE to handle foreign key constraints
+            tablesToClean.forEach { table ->
+                try {
+                    exec("TRUNCATE TABLE $table CASCADE;")
+                } catch (e: Exception) {}
+            }
+        }
         dataSource.close()
     }
 
@@ -85,6 +107,29 @@ class DatabaseIntegrationTest {
             val result = TestTable.selectAll().where { TestTable.id eq insertedId }.single()
 
             assertEquals("Test Item", result[TestTable.name])
+        }
+    }
+
+    @Test
+    fun `category table handles UUID primary keys correctly`() {
+        transaction {
+            SchemaUtils.create(Categories) // Ensure the Categories table is created for this test
+
+            val testUuid = UUID.randomUUID()
+            val categoryName = "Test Category UUID"
+
+            // Insert a new category with a UUID
+            Categories.insert {
+                it[id] = testUuid
+                it[name] = categoryName
+            }
+
+            // Retrieve the category by UUID
+            val retrievedCategory = Categories.selectAll().where { Categories.id eq testUuid }.singleOrNull()
+
+            assertTrue(retrievedCategory != null, "Retrieved category should not be null")
+            assertEquals(testUuid, retrievedCategory?.get(Categories.id))
+            assertEquals(categoryName, retrievedCategory?.get(Categories.name))
         }
     }
 }

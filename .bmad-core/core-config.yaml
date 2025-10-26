@@ -4,7 +4,7 @@ qa:
 prd:
   prdFile: docs/prd.md
   prdVersion: v4
-  prdSharded: true
+  prdSharded: false
   prdShardedLocation: docs/prd
   epicFilePattern: epic-{n}*.md
 architecture:
