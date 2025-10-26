@@ -10,18 +10,19 @@ import java.util.UUID
 
 @Serializable
 data class Category(
-    @Serializable(with = UUIDSerializer::class) val id: UUID,
+    @Serializable(with = UUIDSerializer::class) val id: UUID? = UUID.randomUUID(),
     val name: String
 )
 
-object UUIDSerializer : KSerializer<UUID> {
+@Serializable
+data class NewCategory(
+    val name: String
+)
+
+object UUIDSerializer : KSerializer<UUID?> {
     override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): UUID {
-            return UUID.fromString(decoder.decodeString())
-    }
+    override fun deserialize(decoder: Decoder) = try { UUID.fromString(decoder.decodeString()) } catch (e: Exception) { null }
 
-    override fun serialize(encoder: Encoder, value: UUID) {
-            encoder.encodeString(value.toString())
-    }
+    override fun serialize(encoder: Encoder, value: UUID?) = encoder.encodeString(value.toString())
 }

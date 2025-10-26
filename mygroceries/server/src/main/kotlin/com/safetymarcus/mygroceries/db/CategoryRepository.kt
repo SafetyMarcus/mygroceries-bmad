@@ -1,6 +1,7 @@
 package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Category
+import com.safetymarcus.mygroceries.model.NewCategory
 import java.util.UUID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -12,48 +13,43 @@ object Categories : Table() {
     override val primaryKey = PrimaryKey(id)
 }
 
-class CategoryRepository {
-    fun create(category: Category): Category {
-        transaction {
-            Categories.insert {
-                it[id] = category.id
-                it[name] = category.name
-            }
+object CategoryRepository {
+    fun create(category: NewCategory) = transaction {
+        val ID = UUID.randomUUID()
+        Categories.insert {
+            it[id] = ID
+            it[name] = category.name
         }
-        return category
+        
+        readById(ID)!!
     }
 
-    fun readAll(): List<Category> {
-        return transaction {
-            Categories.selectAll().map { toCategory(it) }
-        }
+    fun readAll(): List<Category> = transaction {
+        Categories.selectAll().map { toCategory(it) }
     }
 
-    fun readById(id: UUID): Category? {
-        return transaction {
-            Categories.select { Categories.id eq id }
-                .mapNotNull { toCategory(it) }
-                .singleOrNull()
-        }
+    fun readById(id: UUID): Category? = transaction {
+        Categories.select { Categories.id eq id }
+            .map { toCategory(it) }
+            .singleOrNull()
     }
 
-    fun update(id: UUID, category: Category): Int {
-        return transaction {
-            Categories.update({ Categories.id eq id }) {
-                it[name] = category.name
-            }
+    fun update(category: Category) = transaction {
+        Categories.update({ Categories.id eq category.id!! }) {
+            it[name] = category.name
         }
     }
 
-    fun delete(id: UUID): Int {
-        return transaction {
-            Categories.deleteWhere { Categories.id eq id }
-        }
+    fun delete(id: UUID) = transaction {
+        Categories.deleteWhere { Categories.id eq id }
     }
 
-    private fun toCategory(row: ResultRow): Category = 
-        Category(
-            id = row[Categories.id],
-            name = row[Categories.name]
-        )
+    fun deleteAll() = transaction {
+        Categories.deleteAll()
+    }
+
+    private fun toCategory(row: ResultRow) = Category(
+        id = row[Categories.id],
+        name = row[Categories.name]
+    )
 }

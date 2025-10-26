@@ -14,6 +14,8 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:3.3.1")
     implementation("io.ktor:ktor-server-netty-jvm:3.3.1")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:3.3.1")
+    implementation("io.ktor:ktor-server-request-validation-jvm:3.3.1")
+    implementation("io.ktor:ktor-server-status-pages-jvm:3.3.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:3.3.1")
     implementation("ch.qos.logback:logback-classic:1.4.11")
 
@@ -68,17 +70,11 @@ tasks.withType<JavaExec> {
 }
 
 tasks.named<Test>("test") {
-
     useJUnitPlatform()
-
     testLogging {
-
         showStandardStreams = true
-
     }
-
     classpath += files(sourceSets.main.get().output.classesDirs, sourceSets.main.get().output.resourcesDir)
-
 }
 
 configurations.testRuntimeClasspath {

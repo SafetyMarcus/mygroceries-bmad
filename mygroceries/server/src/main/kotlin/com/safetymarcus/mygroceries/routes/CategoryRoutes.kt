@@ -1,6 +1,7 @@
 package com.safetymarcus.mygroceries.routes
 
 import com.safetymarcus.mygroceries.model.Category
+import com.safetymarcus.mygroceries.model.NewCategory
 import com.safetymarcus.mygroceries.service.CategoryService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -13,7 +14,7 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
 
     route("/categories") {
         post {
-            val category = call.receive<Category>()
+            val category = call.receive<NewCategory>()
             val newCategory = categoryService.create(category)
             call.respond(HttpStatusCode.Created, newCategory)
         }
@@ -30,9 +31,8 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
         }
 
         put("/{id}") {
-            val id = call.parameters["id"] ?: return@put call.respond(HttpStatusCode.BadRequest, "Missing id")
             val category = call.receive<Category>()
-            val updatedCategory = categoryService.update(UUID.fromString(id), category)
+            val updatedCategory = categoryService.update(category)
             if (updatedCategory != null) {
                 call.respond(updatedCategory)
             } else {

@@ -2,10 +2,9 @@ package com.safetymarcus.mygroceries.routes
 
 import com.safetymarcus.mygroceries.server.module
 import com.safetymarcus.mygroceries.db.CategoryRepository
-import com.safetymarcus.mygroceries.db.TestDatabaseFactory
 import com.safetymarcus.mygroceries.model.Category
+import com.safetymarcus.mygroceries.model.NewCategory
 import com.safetymarcus.mygroceries.service.CategoryService
-import com.safetymarcus.mygroceries.service.CategoryValidator
 import com.safetymarcus.mygroceries.routes.categoryRoutes
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -16,8 +15,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import kotlin.test.*
 import io.ktor.server.application.*
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -25,15 +22,7 @@ import java.util.UUID
 
 class CategoryRoutesTest {
 
-    @BeforeEach
-    fun setup() {
-        TestDatabaseFactory.init()
-    }
-
-    @AfterEach
-    fun tearDown() {
-        TestDatabaseFactory.close()
-    }
+    private val categoryService = CategoryService()
 
     private fun withTestApplication(test: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit) = testApplication {
         application {
@@ -47,11 +36,16 @@ class CategoryRoutesTest {
         test(client)
     }
 
+    @AfterTest
+    fun tearDown() {
+        CategoryRepository.deleteAll()
+    }
+
     @Test
     fun `Create a category`() = withTestApplication { client ->
         val response = client.post("/categories") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = UUID.randomUUID(), name = "Fruits"))
+            setBody(NewCategory(name = "Fruits"))
         }
         assertEquals(HttpStatusCode.Created, response.status)
         val createdCategory = response.body<Category>()
@@ -60,13 +54,8 @@ class CategoryRoutesTest {
     }
 
     @Test
-    fun `test get all categories`() = withTestApplication { client ->
-        // Create a category using the service within the test context
-        val categoryRepository = CategoryRepository()
-        val categoryValidator = CategoryValidator()
-        val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
-
+    fun `Get all categories`() = withTestApplication { client ->
+        categoryService.create(NewCategory(name = "Fruits"))
         val response = client.get("/categories")
         assertEquals(HttpStatusCode.OK, response.status)
         val categories = response.body<List<Category>>()
@@ -75,12 +64,8 @@ class CategoryRoutesTest {
     }
 
     @Test
-    fun `test get category by id`() = withTestApplication { client ->
-        // Create a category using the service within the test context
-        val categoryRepository = CategoryRepository()
-        val categoryValidator = CategoryValidator()
-        val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
+    fun `Get category by id`() = withTestApplication { client ->
+        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
 
         val response = client.get("/categories/${createdCategory.id}")
         assertEquals(HttpStatusCode.OK, response.status)
@@ -89,16 +74,12 @@ class CategoryRoutesTest {
     }
 
     @Test
-    fun `test update category`() = withTestApplication { client ->
-        // Create a category using the service within the test context
-        val categoryRepository = CategoryRepository()
-        val categoryValidator = CategoryValidator()
-        val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
+    fun `Update category`() = withTestApplication { client ->
+        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
 
         val response = client.put("/categories/${createdCategory.id}") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = createdCategory.id, name = "Fresh Fruits"))
+            setBody(NewCategory(name = "Fresh Fruits"))
         }
         assertEquals(HttpStatusCode.OK, response.status)
         val updatedCategory = response.body<Category>()
@@ -106,12 +87,8 @@ class CategoryRoutesTest {
     }
 
     @Test
-    fun `test delete category`() = withTestApplication { client ->
-        // Create a category using the service within the test context
-        val categoryRepository = CategoryRepository()
-        val categoryValidator = CategoryValidator()
-        val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
+    fun `Delete category`() = withTestApplication { client ->
+        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
 
         val deleteResponse = client.delete("/categories/${createdCategory.id}")
         assertEquals(HttpStatusCode.NoContent, deleteResponse.status)
@@ -121,46 +98,42 @@ class CategoryRoutesTest {
     }
 
     @Test
-    fun `test get category by invalid id returns bad request`() = withTestApplication { client ->
+    fun `Get category by invalid id returns bad request`() = withTestApplication { client ->
         val response = client.get("/categories/invalid-uuid")
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
     @Test
-    fun `test update category with invalid id returns bad request`() = withTestApplication { client ->
-        val response = client.put("/categories/invalid-uuid") {
+    fun `Update category with invalid id returns bad request`() = withTestApplication { client ->
+        val response = client.put("/categories") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = UUID.randomUUID(), name = "Vegetables"))
+            setBody(NewCategory(name = "Vegetables"))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
     @Test
-    fun `test delete category with invalid id returns bad request`() = withTestApplication { client ->
-        val response = client.delete("/categories/invalid-uuid")
+    fun `Delete category with invalid id returns bad request`() = withTestApplication { client ->
+        val response = client.delete("/categories")
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
     @Test
-    fun `test create category with empty name returns bad request`() = withTestApplication { client ->
+    fun `Create category with empty name returns bad request`() = withTestApplication { client ->
         val response = client.post("/categories") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = UUID.randomUUID(), name = ""))
+            setBody(NewCategory(name = ""))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
     @Test
-    fun `test update category with empty name returns bad request`() = withTestApplication { client ->
-        // Create a category using the service within the test context
-        val categoryRepository = CategoryRepository()
-        val categoryValidator = CategoryValidator()
-        val categoryService = CategoryService(categoryRepository, categoryValidator)
-        val createdCategory = categoryService.create(Category(id = UUID.randomUUID(), name = "Fruits"))
+    fun `Update category with empty name returns bad request`() = withTestApplication { client ->
+        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
 
         val response = client.put("/categories/${createdCategory.id}") {
             contentType(ContentType.Application.Json)
-            setBody(Category(id = createdCategory.id, name = ""))
+            setBody(NewCategory(name = ""))
         }
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
