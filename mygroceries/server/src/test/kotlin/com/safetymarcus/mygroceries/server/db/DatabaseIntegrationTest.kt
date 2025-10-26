@@ -55,6 +55,23 @@ class DatabaseIntegrationTest {
 
     @AfterEach
     fun tearDown() {
+        transaction {
+            // List of known tables that need to be cleaned up
+            val tablesToClean = listOf(
+                "test_table",  // Test table used only in this test
+                "categories",
+                "products",
+                "orders",
+                "line_items"
+            )
+            
+            // Truncate each table with CASCADE to handle foreign key constraints
+            tablesToClean.forEach { table ->
+                try {
+                    exec("TRUNCATE TABLE $table CASCADE;")
+                } catch (e: Exception) {}
+            }
+        }
         dataSource.close()
     }
 
