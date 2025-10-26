@@ -22,7 +22,7 @@ import java.util.UUID
 
 class CategoryRoutesTest {
 
-    private val categoryService = CategoryService()
+    private lateinit var testCategory: Category
 
     private fun withTestApplication(test: suspend ApplicationTestBuilder.(client: HttpClient) -> Unit) = testApplication {
         application {
@@ -33,6 +33,11 @@ class CategoryRoutesTest {
                 json()
             }
         }
+        //Seed with a test category
+        testCategory = client.post("/categories") {
+            contentType(ContentType.Application.Json)
+            setBody(NewCategory(name = "Test"))
+        }.body<Category>()
         test(client)
     }
 
@@ -55,31 +60,26 @@ class CategoryRoutesTest {
 
     @Test
     fun `Get all categories`() = withTestApplication { client ->
-        categoryService.create(NewCategory(name = "Fruits"))
         val response = client.get("/categories")
         assertEquals(HttpStatusCode.OK, response.status)
         val categories = response.body<List<Category>>()
         assertEquals(1, categories.size)
-        assertEquals("Fruits", categories[0].name)
+        assertEquals("Test", categories[0].name)
     }
 
     @Test
     fun `Get category by id`() = withTestApplication { client ->
-        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
-
-        val response = client.get("/categories/${createdCategory.id}")
+        val response = client.get("/categories/${testCategory.id}")
         assertEquals(HttpStatusCode.OK, response.status)
         val fetchedCategory = response.body<Category>()
-        assertEquals(createdCategory, fetchedCategory)
+        assertEquals(testCategory, fetchedCategory)
     }
 
     @Test
     fun `Update category`() = withTestApplication { client ->
-        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
-
-        val response = client.put("/categories/${createdCategory.id}") {
+        val response = client.put("/categories/${testCategory.id}") {
             contentType(ContentType.Application.Json)
-            setBody(NewCategory(name = "Fresh Fruits"))
+            setBody(Category(id = testCategory.id, name = "Fresh Fruits"))
         }
         assertEquals(HttpStatusCode.OK, response.status)
         val updatedCategory = response.body<Category>()
@@ -88,12 +88,10 @@ class CategoryRoutesTest {
 
     @Test
     fun `Delete category`() = withTestApplication { client ->
-        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
-
-        val deleteResponse = client.delete("/categories/${createdCategory.id}")
+        val deleteResponse = client.delete("/categories/${testCategory.id}")
         assertEquals(HttpStatusCode.NoContent, deleteResponse.status)
 
-        val getByIdResponse = client.get("/categories/${createdCategory.id}")
+        val getByIdResponse = client.get("/categories/${testCategory.id}")
         assertEquals(HttpStatusCode.NotFound, getByIdResponse.status)
     }
 
@@ -129,9 +127,7 @@ class CategoryRoutesTest {
 
     @Test
     fun `Update category with empty name returns bad request`() = withTestApplication { client ->
-        val createdCategory = categoryService.create(NewCategory(name = "Fruits"))
-
-        val response = client.put("/categories/${createdCategory.id}") {
+        val response = client.put("/categories/${UUID.randomUUID()}") {
             contentType(ContentType.Application.Json)
             setBody(NewCategory(name = ""))
         }
