@@ -49,13 +49,3 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
         }
     }
 }
-
-suspend fun ApplicationCall.getAndValidateUUID(name: String): UUID {
-    val param = parameters[name]?.toString()
-    return try {
-        UUID.fromString(param) 
-    } catch (e: Exception) {
-        respond(HttpStatusCode.BadRequest, "Invalid UUID: $param") 
-        throw e
-    }
-}

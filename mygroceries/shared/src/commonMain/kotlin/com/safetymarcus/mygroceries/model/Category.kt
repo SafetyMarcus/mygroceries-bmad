@@ -7,16 +7,18 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.util.UUID
+import com.safetymarcus.mygroceries.service.CategoryName
+import com.safetymarcus.mygroceries.service.CategoryId
 
 @Serializable
 data class Category(
-    @Serializable(with = UUIDSerializer::class) val id: UUID? = UUID.randomUUID(),
-    val name: String
+    @Serializable(with = UUIDSerializer::class) val id: CategoryId? = UUID.randomUUID(),
+    val name: CategoryName
 )
 
 @Serializable
 data class NewCategory(
-    val name: String
+    val name: CategoryName
 )
 
 object UUIDSerializer : KSerializer<UUID?> {

@@ -3,10 +3,15 @@ package com.safetymarcus.mygroceries.server
 import com.safetymarcus.mygroceries.server.db.Database
 import com.safetymarcus.mygroceries.routes.*
 import com.safetymarcus.mygroceries.db.CategoryRepository
+import com.safetymarcus.mygroceries.db.ProductRepository
 import com.safetymarcus.mygroceries.service.CategoryService
+import com.safetymarcus.mygroceries.service.ProductService
 import com.safetymarcus.mygroceries.service.validate
+import com.safetymarcus.mygroceries.service.validate as validateProduct
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
+import com.safetymarcus.mygroceries.model.NewProduct
+import com.safetymarcus.mygroceries.model.Product
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.Request
@@ -56,7 +61,16 @@ fun Application.module() {
             call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
         }
     }
-    categories()
+    
+    val categoryService = CategoryService(CategoryRepository)
+    val productService = ProductService(ProductRepository)
+    
+    categories(categoryService)
+    products(productService)
+    health()
+}
+
+fun Application.health() {
     routing {
         get("/health") {
             call.respondText("OK")
@@ -64,13 +78,24 @@ fun Application.module() {
     }
 }
 
-fun Application.categories() {
+fun Application.categories(service: CategoryService) {
     install(RequestValidation) {
         validate<Category> { it.validate() }
         validate<NewCategory> { it.validate() }
     }
 
     routing {
-        categoryRoutes(CategoryService())
+        categoryRoutes(service)
+    }
+}
+
+fun Application.products(productService: ProductService) {
+    install(RequestValidation) {
+        validate<Product> { it.validate() }
+        validate<NewProduct> { it.validate() }
+    }
+
+    routing {
+        productRoutes(productService)
     }
 }

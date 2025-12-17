@@ -9,11 +9,10 @@ fun Category.validate(): ValidationResult = id.validate() + name.validate()
 
 fun NewCategory.validate(): ValidationResult = name.validate()
 
-private fun UUID?.validate() = takeIf { it != null }?.let { ValidationResult.Valid } ?: ValidationResult.Invalid("Category id cannot be null")
+typealias CategoryId = UUID
 
-private fun String.validate() = takeIf { it.isNotBlank() }?.let { ValidationResult.Valid } ?: ValidationResult.Invalid("Category name cannot be blank")
+private fun CategoryId?.validate() = takeIf { it != null }?.let { ValidationResult.Valid } ?: ValidationResult.Invalid("Category id cannot be null")
 
-operator fun ValidationResult.plus(other: ValidationResult) = when {
-    this is ValidationResult.Valid -> other
-    else -> this
-}
+typealias CategoryName = String
+
+private fun CategoryName.validate() = takeIf { it.isNotBlank() }?.let { ValidationResult.Valid } ?: ValidationResult.Invalid("Category name cannot be blank")
