@@ -1,6 +1,7 @@
 package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Product
+import com.safetymarcus.mygroceries.db.Categories
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -9,8 +10,7 @@ import java.util.UUID
 object Products : Table() {
     val id = uuid("id")
     val name = varchar("name", 255)
-    val categoryId = uuid("category_id")
-    //optReference("categoryId", Categories.id, onDelete = ReferenceOption.CASCADE)    
+    val categoryId = optReference("category_id", Categories.id, onDelete = ReferenceOption.CASCADE)
     override val primaryKey = PrimaryKey(id)
 }
 
