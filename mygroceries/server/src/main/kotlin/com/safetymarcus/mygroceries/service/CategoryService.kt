@@ -17,7 +17,7 @@ class CategoryService(
 
     fun update(category: Category) = categoryRepository
         .update(category)
-        .takeIf { it > 0 }
+        .takeIf { it }
         ?.let { categoryRepository.readById(category.id!!) }
 
     fun delete(id: UUID) = categoryRepository.delete(id) > 0

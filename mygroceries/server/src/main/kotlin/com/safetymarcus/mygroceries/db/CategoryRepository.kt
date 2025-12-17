@@ -14,6 +14,11 @@ object Categories : Table() {
 }
 
 object CategoryRepository {
+    private fun toCategory(row: ResultRow) = Category(
+        id = row[Categories.id],
+        name = row[Categories.name]
+    )
+    
     fun create(category: NewCategory) = transaction {
         val ID = UUID.randomUUID()
         Categories.insert {
@@ -37,19 +42,12 @@ object CategoryRepository {
     fun update(category: Category) = transaction {
         Categories.update({ Categories.id eq category.id!! }) {
             it[name] = category.name
-        }
+        } > 0
     }
 
     fun delete(id: UUID) = transaction {
         Categories.deleteWhere { Categories.id eq id }
     }
 
-    fun deleteAll() = transaction {
-        Categories.deleteAll()
-    }
-
-    private fun toCategory(row: ResultRow) = Category(
-        id = row[Categories.id],
-        name = row[Categories.name]
-    )
+    fun deleteAll() = transaction { Categories.deleteAll() }
 }

@@ -1,13 +1,15 @@
 package com.safetymarcus.mygroceries.routes
 
-import com.safetymarcus.mygroceries.model.NewProduct
-import com.safetymarcus.mygroceries.model.Product
-import com.safetymarcus.mygroceries.service.ProductService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.util.*
+import com.safetymarcus.mygroceries.routes.getAndValidateUUID
+import com.safetymarcus.mygroceries.model.NewProduct
+import com.safetymarcus.mygroceries.model.Product
+import com.safetymarcus.mygroceries.service.ProductService
 
 fun Route.productRoutes(productService: ProductService) {
     route("/products") {
@@ -15,7 +17,7 @@ fun Route.productRoutes(productService: ProductService) {
             val newProduct = call.receive<NewProduct>()
             val createdProduct = productService.create(
                 name = newProduct.name,
-                categoryId = newProduct.categoryId
+                categoryId = newProduct.categoryId!!
             )
             call.respond(HttpStatusCode.Created, createdProduct)
         }
@@ -46,11 +48,8 @@ fun Route.productRoutes(productService: ProductService) {
 
         delete("/{id}") {
             val id = call.getAndValidateUUID("id")
-            if (productService.delete(id)) {
-                call.respond(HttpStatusCode.NoContent)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+            if (productService.delete(id)) call.respond(HttpStatusCode.NoContent)
+            else call.respond(HttpStatusCode.NotFound)
         }
     }
 }

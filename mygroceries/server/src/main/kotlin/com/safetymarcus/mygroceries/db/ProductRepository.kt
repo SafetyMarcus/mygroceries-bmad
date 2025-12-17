@@ -14,19 +14,18 @@ object Products : Table() {
     override val primaryKey = PrimaryKey(id)
     
     init {
-        foreignKey("fk_products_categories", categoryId, Categories.id)
+        // foreignKey("fk_products_categories", categoryId, Categories.id)
     }
 }
 
 object ProductRepository {
-    private fun toProduct(row: ResultRow): Product =
-        Product(
-            id = row[Products.id].toString(),
+    private fun toProduct(row: ResultRow) = Product(
+            id = row[Products.id],
             name = row[Products.name],
-            categoryId = row[Products.categoryId].toString()
+            categoryId = row[Products.categoryId]
         )
 
-    fun create(name: String, categoryId: UUID): Product = transaction {
+    fun create(name: String, categoryId: UUID) = transaction {
         val id = UUID.randomUUID()
         Products.insert {
             it[Products.id] = id
@@ -37,9 +36,7 @@ object ProductRepository {
         readById(id)!!
     }
 
-    fun readAll(): List<Product> = transaction {
-        Products.selectAll().map { toProduct(it) }
-    }
+    fun readAll() = transaction { Products.selectAll().map { toProduct(it) } }
 
     fun readById(id: UUID): Product? = transaction {
         Products.select { Products.id eq id }
@@ -47,24 +44,14 @@ object ProductRepository {
             .singleOrNull()
     }
 
-    fun update(product: Product): Boolean = transaction {
-        Products.update({ Products.id eq UUID.fromString(product.id) }) {
+    fun update(product: Product) = transaction {
+        Products.update({ Products.id eq product.id!! }) {
             it[name] = product.name
-            it[categoryId] = UUID.fromString(product.categoryId)
+            it[categoryId] = product.categoryId!!
         } > 0
     }
 
-    fun delete(id: UUID): Boolean = transaction {
-        Products.deleteWhere { Products.id eq id } > 0
-    }
+    fun delete(id: UUID) = transaction { Products.deleteWhere { Products.id eq id } }
 
-    fun deleteAll() = transaction {
-        Products.deleteAll()
-    }
-
-    fun existsByCategoryId(categoryId: UUID): Boolean = transaction {
-        Products.select { Products.categoryId eq categoryId }
-            .limit(1)
-            .count() > 0
-    }
+    fun deleteAll() = transaction { Products.deleteAll() }
 }

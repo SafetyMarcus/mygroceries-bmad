@@ -6,15 +6,15 @@ import java.util.UUID
 @Serializable
 data class Product(
     @Serializable(with = UUIDSerializer::class)
-    val id: ProductId = UUID.randomUUID(),
+    val id: ProductId? = UUID.randomUUID(),
     val name: ProductName,
     @Serializable(with = UUIDSerializer::class)
-    val categoryId: CategoryId
+    val categoryId: CategoryId?
 )
 
 @Serializable
 data class NewProduct(
     val name: ProductName,
     @Serializable(with = UUIDSerializer::class)
-    val categoryId: CategoryId
+    val categoryId: CategoryId?
 )
