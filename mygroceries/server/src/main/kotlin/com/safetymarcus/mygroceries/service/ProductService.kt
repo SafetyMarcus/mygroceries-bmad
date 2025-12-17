@@ -3,13 +3,16 @@ package com.safetymarcus.mygroceries.service
 import com.safetymarcus.mygroceries.db.ProductRepository
 import com.safetymarcus.mygroceries.model.NewProduct
 import com.safetymarcus.mygroceries.model.Product
+import com.safetymarcus.mygroceries.model.ProductName
 import java.util.UUID
 
 class ProductService(
     private val productRepository: ProductRepository = ProductRepository
 ) {
-    fun create(name: String, categoryId: UUID): Product =
-        productRepository.create(name, categoryId)
+    fun create(name: String, categoryId: UUID): Product {
+        val productName = ProductName(name)
+        return productRepository.create(productName, categoryId)
+    }
 
     fun readAll(): List<Product> = productRepository.readAll()
 
