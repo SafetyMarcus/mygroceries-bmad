@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import kotlin.uuid.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ProductServiceTest {
@@ -75,28 +76,17 @@ class ProductServiceTest {
     @Test
     fun `update existing product`() = runBlocking {
         val productId = Uuid.random()
-        val categoryId = Uuid.random()
         val updatedProduct = Product(
             id = productId, 
             name = "Updated Apple", 
-            categoryId = categoryId
-        )
-        val existingProduct = Product(
-            id = productId, 
-            name = "Apple", 
-            categoryId = categoryId
+            categoryId = Uuid.random()
         )
         
-        coEvery { productRepository.readById(productId.toString()) } returns existingProduct
         coEvery { productRepository.update(updatedProduct) } returns true
-
-        val result = productService.update(updatedProduct)
-
-        assertEquals(updatedProduct, result)
-        coVerify { 
-            productRepository.readById(productId.toString())
-            productRepository.update(updatedProduct) 
-        }
+        coEvery { productRepository.readById(productId.toString()) } returns updatedProduct
+        
+        assertEquals(updatedProduct, productService.update(updatedProduct))
+        coVerify { productRepository.update(updatedProduct) }
     }
 
     @Test
@@ -107,13 +97,10 @@ class ProductServiceTest {
             name = "Apple", 
             categoryId = Uuid.random()
         )
-        coEvery { productRepository.readById(productId.toString()) } returns null
+        coEvery { productRepository.update(product) } returns false
 
-        val result = productService.update(product)
-
-        assertNull(result)
-        coVerify { productRepository.readById(productId.toString()) }
-        coVerify(exactly = 0) { productRepository.update(any()) }
+        assertNull(productService.update(product))
+        coVerify { productRepository.update(product) }
     }
 
     @Test

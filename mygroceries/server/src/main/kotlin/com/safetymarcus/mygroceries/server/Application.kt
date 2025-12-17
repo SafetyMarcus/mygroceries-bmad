@@ -60,6 +60,7 @@ fun Application.module() {
     val categoryService = CategoryService(CategoryRepository)
     val productService = ProductService(ProductRepository)
     
+    validations()
     categories(categoryService)
     products(productService)
     health()
@@ -73,23 +74,22 @@ fun Application.health() {
     }
 }
 
-fun Application.categories(service: CategoryService) {
+fun Application.validations() {
     install(RequestValidation) {
         validate<Category> { it.validate().result() }
         validate<NewCategory> { it.validate().result() }
+        validate<Product> { it.validate().result() }
+        validate<NewProduct> { it.validate().result() }
     }
+}
 
+fun Application.categories(service: CategoryService) {
     routing {
         categoryRoutes(service)
     }
 }
 
 fun Application.products(productService: ProductService) {
-    install(RequestValidation) {
-        validate<Product> { it.validate().result() }
-        validate<NewProduct> { it.validate().result() }
-    }
-
     routing {
         productRoutes(productService)
     }
