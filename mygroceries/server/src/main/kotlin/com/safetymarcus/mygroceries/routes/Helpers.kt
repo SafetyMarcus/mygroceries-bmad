@@ -3,14 +3,14 @@ package com.safetymarcus.mygroceries.routes
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.http.*
-import java.util.UUID
+import kotlin.uuid.*
 
-suspend fun ApplicationCall.getAndValidateUUID(name: String): UUID {
-    val param = parameters[name]?.toString()
+suspend fun ApplicationCall.getAndValidateUUID(name: String): Uuid {
     return try {
-        UUID.fromString(param) 
+        val param = parameters[name]!!.toString()
+        Uuid.parse(param)
     } catch (e: Exception) {
-        respond(HttpStatusCode.BadRequest, "Invalid UUID: $param") 
+        respond(HttpStatusCode.BadRequest, "Invalid UUID: $name") 
         throw e
     }
 }

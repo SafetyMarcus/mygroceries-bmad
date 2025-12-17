@@ -7,7 +7,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
-import java.util.UUID
+import kotlin.uuid.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -21,7 +21,7 @@ class ProductServiceTest {
     fun `create product with valid data`() = runBlocking {
         // Given
         val productName = "Apple"
-        val categoryId = UUID.randomUUID()
+        val categoryId = Uuid.random()
         val expectedProduct = Product(name = productName, categoryId = categoryId)
         
         coEvery { productRepository.create(any(), any()) } returns expectedProduct
@@ -31,15 +31,15 @@ class ProductServiceTest {
 
         // Then
         assertEquals(expectedProduct, result)
-        coVerify { productRepository.create(productName, categoryId) }
+        coVerify { productRepository.create(productName, categoryId.toString()) }
     }
 
     @Test
     fun `read all products`() = runBlocking {
         // Given
         val expectedProducts = listOf(
-            Product(name = "Apple", categoryId = UUID.randomUUID()),
-            Product(name = "Banana", categoryId = UUID.randomUUID())
+            Product(name = "Apple", categoryId = Uuid.random()),
+            Product(name = "Banana", categoryId = Uuid.random())
         )
         coEvery { productRepository.readAll() } returns expectedProducts
 
@@ -54,41 +54,41 @@ class ProductServiceTest {
     @Test
     fun `read product by valid id`() = runBlocking {
         // Given
-        val productId = UUID.randomUUID()
+        val productId = Uuid.random()
         val expectedProduct = Product(
             id = productId, 
             name = "Apple", 
-            categoryId = UUID.randomUUID()
+            categoryId = Uuid.random()
         )
-        coEvery { productRepository.readById(productId) } returns expectedProduct
+        coEvery { productRepository.readById(productId.toString()) } returns expectedProduct
 
         // When
         val result = productService.readById(productId)
 
         // Then
         assertEquals(expectedProduct, result)
-        coVerify { productRepository.readById(productId) }
+        coVerify { productRepository.readById(productId.toString()) }
     }
 
     @Test
     fun `return null when reading non-existent product`() = runBlocking {
         // Given
-        val productId = UUID.randomUUID()
-        coEvery { productRepository.readById(productId) } returns null
+        val productId = Uuid.random()
+        coEvery { productRepository.readById(productId.toString()) } returns null
 
         // When
         val result = productService.readById(productId)
 
         // Then
         assertNull(result)
-        coVerify { productRepository.readById(productId) }
+        coVerify { productRepository.readById(productId.toString()) }
     }
 
     @Test
     fun `update existing product`() = runBlocking {
         // Given
-        val productId = UUID.randomUUID()
-        val categoryId = UUID.randomUUID()
+        val productId = Uuid.random()
+        val categoryId = Uuid.random()
         val updatedProduct = Product(
             id = productId, 
             name = "Updated Apple", 
@@ -100,7 +100,7 @@ class ProductServiceTest {
             categoryId = categoryId
         )
         
-        coEvery { productRepository.readById(productId) } returns existingProduct
+        coEvery { productRepository.readById(productId.toString()) } returns existingProduct
         coEvery { productRepository.update(updatedProduct) } returns true
 
         // When
@@ -109,7 +109,7 @@ class ProductServiceTest {
         // Then
         assertEquals(updatedProduct, result)
         coVerify { 
-            productRepository.readById(productId)
+            productRepository.readById(productId.toString())
             productRepository.update(updatedProduct) 
         }
     }
@@ -117,48 +117,48 @@ class ProductServiceTest {
     @Test
     fun `return null when updating non-existent product`() = runBlocking {
         // Given
-        val productId = UUID.randomUUID()
+        val productId = Uuid.random()
         val product = Product(
             id = productId, 
             name = "Apple", 
-            categoryId = UUID.randomUUID()
+            categoryId = Uuid.random()
         )
-        coEvery { productRepository.readById(productId) } returns null
+        coEvery { productRepository.readById(productId.toString()) } returns null
 
         // When
         val result = productService.update(product)
 
         // Then
         assertNull(result)
-        coVerify { productRepository.readById(productId) }
+        coVerify { productRepository.readById(productId.toString()) }
         coVerify(exactly = 0) { productRepository.update(any()) }
     }
 
     @Test
     fun `delete existing product`() = runBlocking {
         // Given
-        val productId = UUID.randomUUID()
-        coEvery { productRepository.delete(productId) } returns true
+        val productId = Uuid.random()
+        coEvery { productRepository.delete(productId.toString()) } returns true
 
         // When
         val result = productService.delete(productId)
 
         // Then
         assertTrue(result)
-        coVerify { productRepository.delete(productId) }
+        coVerify { productRepository.delete(productId.toString()) }
     }
 
     @Test
     fun `return false when deleting non-existent product`() = runBlocking {
         // Given
-        val productId = UUID.randomUUID()
-        coEvery { productRepository.delete(productId) } returns false
+        val productId = Uuid.random()
+        coEvery { productRepository.delete(productId.toString()) } returns false
 
         // When
         val result = productService.delete(productId)
 
         // Then
         assertTrue(!result)
-        coVerify { productRepository.delete(productId) }
+        coVerify { productRepository.delete(productId.toString()) }
     }
 }

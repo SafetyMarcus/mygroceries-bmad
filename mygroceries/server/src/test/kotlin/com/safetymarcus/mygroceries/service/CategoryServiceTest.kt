@@ -6,7 +6,7 @@ import com.safetymarcus.mygroceries.model.NewCategory
 import io.mockk.coEvery
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
-import java.util.UUID
+import kotlin.uuid.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -25,27 +25,27 @@ class CategoryServiceTest {
 
     @Test
     fun `get category by valid id`() {
-        val id = UUID.randomUUID()
+        val id = Uuid.random()
         val category = Category(id = id, name = "Fruits")
-        coEvery { categoryRepository.readById(id) } returns category
+        coEvery { categoryRepository.readById(id.toString()) } returns category
         val result = categoryService.readById(id)
         assertEquals(category, result)
     }
 
     @Test
     fun `update category with valid data`() {
-        val id = UUID.randomUUID()
+        val id = Uuid.random()
         val category = Category(id = id, name = "Vegetables")
-        coEvery { categoryRepository.update(category) } returns 1
-        coEvery { categoryRepository.readById(id) } returns category
+        coEvery { categoryRepository.update(category) } returns true
+        coEvery { categoryRepository.readById(id.toString()) } returns category
         val result = categoryService.update(category)
         assertEquals(category, result)
     }
 
     @Test
     fun `delete category with valid id`() {
-        val id = UUID.randomUUID()
-        coEvery { categoryRepository.delete(id) } returns 1
+        val id = Uuid.random()
+        coEvery { categoryRepository.delete(id.toString()) } returns true
         val result = categoryService.delete(id)
         assertEquals(true, result)
     }

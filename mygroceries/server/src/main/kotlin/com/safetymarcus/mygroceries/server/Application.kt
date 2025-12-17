@@ -4,14 +4,9 @@ import com.safetymarcus.mygroceries.server.db.Database
 import com.safetymarcus.mygroceries.routes.*
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.db.ProductRepository
-import com.safetymarcus.mygroceries.service.CategoryService
-import com.safetymarcus.mygroceries.service.ProductService
-import com.safetymarcus.mygroceries.service.validate
-import com.safetymarcus.mygroceries.service.validate as validateProduct
-import com.safetymarcus.mygroceries.model.Category
-import com.safetymarcus.mygroceries.model.NewCategory
-import com.safetymarcus.mygroceries.model.NewProduct
-import com.safetymarcus.mygroceries.model.Product
+import com.safetymarcus.mygroceries.service.*
+import com.safetymarcus.mygroceries.model.*
+import com.safetymarcus.mygroceries.validators.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.Request
@@ -80,8 +75,8 @@ fun Application.health() {
 
 fun Application.categories(service: CategoryService) {
     install(RequestValidation) {
-        validate<Category> { it.validate() }
-        validate<NewCategory> { it.validate() }
+        validate<Category> { it.validate().result() }
+        validate<NewCategory> { it.validate().result() }
     }
 
     routing {
@@ -91,8 +86,8 @@ fun Application.categories(service: CategoryService) {
 
 fun Application.products(productService: ProductService) {
     install(RequestValidation) {
-        validate<Product> { it.validate() }
-        validate<NewProduct> { it.validate() }
+        validate<Product> { it.validate().result() }
+        validate<NewProduct> { it.validate().result() }
     }
 
     routing {

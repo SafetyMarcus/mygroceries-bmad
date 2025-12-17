@@ -5,7 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.util.UUID
+import kotlin.uuid.Uuid
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
 import com.safetymarcus.mygroceries.service.CategoryService

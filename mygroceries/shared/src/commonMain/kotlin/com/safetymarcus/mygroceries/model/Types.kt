@@ -1,9 +1,8 @@
 package com.safetymarcus.mygroceries.model
 
-import kotlinx.serialization.Serializable
-import java.util.UUID
+import kotlin.uuid.*
 
-typealias ProductId = UUID
-typealias CategoryId = UUID
+typealias ProductId = Uuid
+typealias CategoryId = Uuid
 typealias ProductName = String
 typealias CategoryName = String

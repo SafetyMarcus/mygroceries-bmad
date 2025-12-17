@@ -19,7 +19,7 @@ import io.ktor.server.application.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import java.util.UUID
+import kotlin.uuid.*
 
 
 
@@ -131,7 +131,7 @@ class CategoryRoutesTest {
 
     @Test
     fun `Update category with empty name returns bad request`() = withTestApplication { client ->
-        val response = client.put("/categories/${UUID.randomUUID()}") {
+        val response = client.put("/categories/${Uuid.random()}") {
             contentType(ContentType.Application.Json)
             setBody(NewCategory(name = ""))
         }

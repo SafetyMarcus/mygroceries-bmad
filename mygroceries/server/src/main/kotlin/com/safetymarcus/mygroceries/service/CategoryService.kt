@@ -3,7 +3,7 @@ package com.safetymarcus.mygroceries.service
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
-import java.util.UUID
+import kotlin.uuid.*
 
 class CategoryService(
     private val categoryRepository: CategoryRepository = CategoryRepository,
@@ -13,12 +13,12 @@ class CategoryService(
 
     fun readAll() = categoryRepository.readAll()
 
-    fun readById(id: UUID) = categoryRepository.readById(id)
+    fun readById(id: Uuid): Category? = categoryRepository.readById(id.toString())
 
-    fun update(category: Category) = categoryRepository
+    fun update(category: Category): Category? = categoryRepository
         .update(category)
         .takeIf { it }
-        ?.let { categoryRepository.readById(category.id!!) }
+        ?.let { categoryRepository.readById(category.id.toString()!!) }
 
-    fun delete(id: UUID) = categoryRepository.delete(id) > 0
+    fun delete(id: Uuid): Boolean = categoryRepository.delete(id.toString())
 }

@@ -1,8 +1,9 @@
 package com.safetymarcus.mygroceries.service
 
-import io.ktor.server.plugins.requestvalidation.*
+import com.safetymarcus.mygroceries.validators.Validator
+import io.ktor.server.plugins.requestvalidation.ValidationResult
 
-operator fun ValidationResult.plus(other: ValidationResult) = when {
-    this is ValidationResult.Valid -> other
-    else -> this
+fun Validator.result() = when {
+    this is Validator.Invalid -> ValidationResult.Invalid(this.message)
+    else -> ValidationResult.Valid
 }
