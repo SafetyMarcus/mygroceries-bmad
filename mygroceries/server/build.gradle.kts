@@ -49,6 +49,17 @@ dependencies {
     testImplementation(project(":server"))
 }
 
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            optIn("kotlin.uuid.ExperimentalUuidApi")
+        }
+        compilerOptions {
+            freeCompilerArgs.add("-Xcontext-parameters")
+        }
+    }
+}
+
 application {
     mainClass.set("com.safetymarcus.mygroceries.server.ApplicationKt")
 }

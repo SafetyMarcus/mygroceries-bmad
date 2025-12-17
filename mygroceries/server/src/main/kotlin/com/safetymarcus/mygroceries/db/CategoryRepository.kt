@@ -14,6 +14,11 @@ object Categories : Table() {
 }
 
 object CategoryRepository {
+    private fun toCategory(row: ResultRow) = Category(
+        stringId = row[Categories.id].toString(),
+        name = row[Categories.name]
+    )
+    
     fun create(category: NewCategory) = transaction {
         val ID = UUID.randomUUID()
         Categories.insert {
@@ -21,35 +26,30 @@ object CategoryRepository {
             it[name] = category.name
         }
         
-        readById(ID)!!
+        readById(ID.toString())!!
     }
 
     fun readAll(): List<Category> = transaction {
         Categories.selectAll().map { toCategory(it) }
     }
 
-    fun readById(id: UUID): Category? = transaction {
-        Categories.select { Categories.id eq id }
+    fun readById(id: String): Category? = transaction {
+        val uuid = UUID.fromString(id)
+        Categories.select { Categories.id eq uuid }
             .map { toCategory(it) }
             .singleOrNull()
     }
 
     fun update(category: Category) = transaction {
-        Categories.update({ Categories.id eq category.id!! }) {
+        Categories.update({ Categories.id eq UUID.fromString(category.id?.toString()) }) {
             it[name] = category.name
-        }
+        } > 0
     }
 
-    fun delete(id: UUID) = transaction {
-        Categories.deleteWhere { Categories.id eq id }
+    fun delete(id: String) = transaction {
+        val uuid = UUID.fromString(id)
+        Categories.deleteWhere { Categories.id eq uuid } > 0
     }
 
-    fun deleteAll() = transaction {
-        Categories.deleteAll()
-    }
-
-    private fun toCategory(row: ResultRow) = Category(
-        id = row[Categories.id],
-        name = row[Categories.name]
-    )
+    fun deleteAll() = transaction { Categories.deleteAll() }
 }

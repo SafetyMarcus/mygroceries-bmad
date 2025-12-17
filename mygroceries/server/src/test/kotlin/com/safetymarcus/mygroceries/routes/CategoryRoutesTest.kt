@@ -5,6 +5,10 @@ import com.safetymarcus.mygroceries.server.db.Database
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
+import com.safetymarcus.mygroceries.model.Product
+import com.safetymarcus.mygroceries.model.NewProduct
+import com.safetymarcus.mygroceries.db.ProductRepository
+import kotlin.uuid.*
 import com.safetymarcus.mygroceries.service.CategoryService
 import com.safetymarcus.mygroceries.routes.categoryRoutes
 import io.ktor.client.call.*
@@ -19,7 +23,7 @@ import io.ktor.server.application.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import java.util.UUID
+import kotlin.uuid.*
 
 
 
@@ -100,6 +104,33 @@ class CategoryRoutesTest {
     }
 
     @Test
+    fun `Delete category with products cascades to products`() = withTestApplication { client ->
+        // Create a product in the test category
+        val newProduct = NewProduct(
+            name = "Test Product",
+            categoryId = Uuid.parse(testCategory.id.toString())
+        )
+        val productResponse = client.post("/products") {
+            contentType(ContentType.Application.Json)
+            setBody(newProduct)
+        }
+        assertEquals(HttpStatusCode.Created, productResponse.status)
+        val createdProduct = productResponse.body<Product>()
+
+        // Delete the category
+        val deleteResponse = client.delete("/categories/${testCategory.id}")
+        assertEquals(HttpStatusCode.NoContent, deleteResponse.status)
+
+        // Verify the category is deleted
+        val getCategoryResponse = client.get("/categories/${testCategory.id}")
+        assertEquals(HttpStatusCode.NotFound, getCategoryResponse.status)
+
+        // Verify the product is also deleted
+        val getProductResponse = client.get("/products/${createdProduct.id}")
+        assertEquals(HttpStatusCode.NotFound, getProductResponse.status)
+    }
+
+    @Test
     fun `Get category by invalid id returns bad request`() = withTestApplication { client ->
         val response = client.get("/categories/invalid-uuid")
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -131,7 +162,7 @@ class CategoryRoutesTest {
 
     @Test
     fun `Update category with empty name returns bad request`() = withTestApplication { client ->
-        val response = client.put("/categories/${UUID.randomUUID()}") {
+        val response = client.put("/categories/${Uuid.random()}") {
             contentType(ContentType.Application.Json)
             setBody(NewCategory(name = ""))
         }

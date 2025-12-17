@@ -1,14 +1,15 @@
 package com.safetymarcus.mygroceries.routes
 
-import com.safetymarcus.mygroceries.model.Category
-import com.safetymarcus.mygroceries.model.NewCategory
-import com.safetymarcus.mygroceries.service.CategoryService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.util.UUID
+import kotlin.uuid.Uuid
+import com.safetymarcus.mygroceries.model.Category
+import com.safetymarcus.mygroceries.model.NewCategory
+import com.safetymarcus.mygroceries.service.CategoryService
+import com.safetymarcus.mygroceries.routes.getAndValidateUUID
 
 fun Route.categoryRoutes(categoryService: CategoryService) {
 
@@ -47,15 +48,5 @@ fun Route.categoryRoutes(categoryService: CategoryService) {
             if (categoryService.delete(id)) call.respond(HttpStatusCode.NoContent)
             else call.respond(HttpStatusCode.NotFound)
         }
-    }
-}
-
-suspend fun ApplicationCall.getAndValidateUUID(name: String): UUID {
-    val param = parameters[name]?.toString()
-    return try {
-        UUID.fromString(param) 
-    } catch (e: Exception) {
-        respond(HttpStatusCode.BadRequest, "Invalid UUID: $param") 
-        throw e
     }
 }

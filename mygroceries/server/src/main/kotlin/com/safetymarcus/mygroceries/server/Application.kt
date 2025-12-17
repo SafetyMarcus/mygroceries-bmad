@@ -3,10 +3,10 @@ package com.safetymarcus.mygroceries.server
 import com.safetymarcus.mygroceries.server.db.Database
 import com.safetymarcus.mygroceries.routes.*
 import com.safetymarcus.mygroceries.db.CategoryRepository
-import com.safetymarcus.mygroceries.service.CategoryService
-import com.safetymarcus.mygroceries.service.validate
-import com.safetymarcus.mygroceries.model.Category
-import com.safetymarcus.mygroceries.model.NewCategory
+import com.safetymarcus.mygroceries.db.ProductRepository
+import com.safetymarcus.mygroceries.service.*
+import com.safetymarcus.mygroceries.model.*
+import com.safetymarcus.mygroceries.validators.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.cio.Request
@@ -56,7 +56,17 @@ fun Application.module() {
             call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
         }
     }
-    categories()
+    
+    val categoryService = CategoryService(CategoryRepository)
+    val productService = ProductService(ProductRepository)
+    
+    validations()
+    categories(categoryService)
+    products(productService, categoryService)
+    health()
+}
+
+fun Application.health() {
     routing {
         get("/health") {
             call.respondText("OK")
@@ -64,13 +74,23 @@ fun Application.module() {
     }
 }
 
-fun Application.categories() {
+fun Application.validations() {
     install(RequestValidation) {
-        validate<Category> { it.validate() }
-        validate<NewCategory> { it.validate() }
+        validate<Category> { it.validate().result() }
+        validate<NewCategory> { it.validate().result() }
+        validate<Product> { it.validate().result() }
+        validate<NewProduct> { it.validate().result() }
     }
+}
 
+fun Application.categories(service: CategoryService) {
     routing {
-        categoryRoutes(CategoryService())
+        categoryRoutes(service)
+    }
+}
+
+fun Application.products(productService: ProductService, categoryService: CategoryService) {
+    routing {
+        productRoutes(productService, categoryService)
     }
 }
