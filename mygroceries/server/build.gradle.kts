@@ -54,6 +54,9 @@ kotlin {
         languageSettings {
             optIn("kotlin.uuid.ExperimentalUuidApi")
         }
+        compilerOptions {
+            freeCompilerArgs.add("-Xcontext-parameters")
+        }
     }
 }
 

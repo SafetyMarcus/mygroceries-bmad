@@ -10,12 +10,8 @@ object Products : Table() {
     val id = uuid("id")
     val name = varchar("name", 255)
     val categoryId = uuid("category_id")
-    
+    //optReference("categoryId", Categories.id, onDelete = ReferenceOption.CASCADE)    
     override val primaryKey = PrimaryKey(id)
-    
-    init {
-        // foreignKey("fk_products_categories", categoryId, Categories.id)
-    }
 }
 
 object ProductRepository {

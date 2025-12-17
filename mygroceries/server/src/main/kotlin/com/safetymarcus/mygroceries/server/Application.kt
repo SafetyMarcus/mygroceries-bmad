@@ -62,7 +62,7 @@ fun Application.module() {
     
     validations()
     categories(categoryService)
-    products(productService)
+    products(productService, categoryService)
     health()
 }
 
@@ -89,8 +89,8 @@ fun Application.categories(service: CategoryService) {
     }
 }
 
-fun Application.products(productService: ProductService) {
+fun Application.products(productService: ProductService, categoryService: CategoryService) {
     routing {
-        productRoutes(productService)
+        productRoutes(productService, categoryService)
     }
 }

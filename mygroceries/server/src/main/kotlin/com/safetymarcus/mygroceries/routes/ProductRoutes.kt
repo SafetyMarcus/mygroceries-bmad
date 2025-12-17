@@ -5,16 +5,31 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.util.*
+import kotlin.uuid.*
 import com.safetymarcus.mygroceries.routes.getAndValidateUUID
 import com.safetymarcus.mygroceries.model.NewProduct
 import com.safetymarcus.mygroceries.model.Product
 import com.safetymarcus.mygroceries.service.ProductService
+import com.safetymarcus.mygroceries.service.CategoryService
 
-fun Route.productRoutes(productService: ProductService) {
+context(call: ApplicationCall)
+suspend fun CategoryService.validateCategoryExists(categoryId: Uuid) {
+    val category = readById(categoryId)
+    if (category == null) {
+        call.respond(HttpStatusCode.BadRequest, "Category does not exist")
+        return
+    }
+}
+
+fun Route.productRoutes(productService: ProductService, categoryService: CategoryService) {
     route("/products") {
         post {
             val newProduct = call.receive<NewProduct>()
+
+            context(call) {
+                categoryService.validateCategoryExists(newProduct.categoryId!!)
+            }
+
             val createdProduct = productService.create(
                 name = newProduct.name,
                 categoryId = newProduct.categoryId!!
@@ -40,6 +55,10 @@ fun Route.productRoutes(productService: ProductService) {
             if (updateProduct.id != id) {
                 call.respond(HttpStatusCode.BadRequest, "Product ID in path does not match ID in request body")
                 return@put
+            }
+
+            context(call) {
+                categoryService.validateCategoryExists(updateProduct.categoryId!!)
             }
 
             val updatedProduct = productService.update(updateProduct)
