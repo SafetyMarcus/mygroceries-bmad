@@ -13,7 +13,7 @@ object LineItemRepository {
         orderId = row[LineItems.orderId].toString(),
         productId = row[LineItems.productId].toString(),
         quantity = row[LineItems.quantity],
-        cost = row[LineItems.cost].toDouble()
+        cost = row[LineItems.cost]
     )
 
     suspend fun create(orderId: UUID, lineItem: NewLineItem) = dbQuery {
@@ -23,7 +23,7 @@ object LineItemRepository {
             it[LineItems.orderId] = orderId
             it[LineItems.productId] = lineItem.productId!!.toJavaUuid()
             it[LineItems.quantity] = lineItem.quantity
-            it[LineItems.cost] = lineItem.cost.toBigDecimal()
+            it[LineItems.cost] = lineItem.cost
         }
         readById(id)!!
     }
@@ -48,11 +48,13 @@ object LineItemRepository {
             it[LineItems.orderId] = lineItem.orderId!!.toJavaUuid()
             it[LineItems.productId] = lineItem.productId!!.toJavaUuid()
             it[LineItems.quantity] = lineItem.quantity
-            it[LineItems.cost] = lineItem.cost.toBigDecimal()
+            it[LineItems.cost] = lineItem.cost
         } > 0
     }
 
     suspend fun delete(lineItemId: UUID) = dbQuery { 
         LineItems.deleteWhere { LineItems.id eq id } > 0 
     }
+
+    suspend fun deleteAll() = dbQuery { LineItems.deleteAll() }
 }

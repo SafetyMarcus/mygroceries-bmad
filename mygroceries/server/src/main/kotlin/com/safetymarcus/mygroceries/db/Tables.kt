@@ -29,7 +29,7 @@ object LineItems : Table("line_items") {
     val orderId = reference("order_id", Orders.id, onDelete = ReferenceOption.CASCADE)
     val productId = reference("product_id", Products.id) //Intentionally no cascading deletes as orders should have immutable line item references
     val quantity = double("quantity")
-    val cost = decimal("cost", 10, 2)
+    val cost = integer("cost")
     
     override val primaryKey = PrimaryKey(id)
 }

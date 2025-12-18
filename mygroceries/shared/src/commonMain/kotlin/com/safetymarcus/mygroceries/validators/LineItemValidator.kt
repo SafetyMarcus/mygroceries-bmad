@@ -23,6 +23,6 @@ private fun LineItemId?.validate() = takeIf { it != null }?.let { Validator.Vali
 private fun Double.validate() = takeIf { it > 0 }?.let { Validator.Valid } 
     ?: Validator.Invalid("Quantity must be greater than 0")
 
-private fun Double?.validate() = takeIf { it != null }?.let { 
-    if (it >= 0) Validator.Valid else Validator.Invalid("Cost cannot be negative") 
-} ?: Validator.Invalid("Cost cannot be null")
+private fun Int.validate() = takeIf { it >= 0 }
+    ?.let { Validator.Valid }
+    ?: Validator.Invalid("Cost cannot be null")

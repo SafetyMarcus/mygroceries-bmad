@@ -15,20 +15,21 @@ data class LineItem(
     @Serializable(with = UUIDSerializer::class)
     val productId: ProductId?,
     val quantity: Double,
-    val cost: Double,
+    val cost: Int, //cents
 ) {
     constructor(
         stringId: String,
         orderId: String,
         productId: String,
         quantity: Double,
-        cost: Double): this(
-            Uuid.parse(stringId),
-            Uuid.parse(orderId),
-            Uuid.parse(productId),
-            quantity,
-            cost
-        )
+        cost: Int
+    ): this(
+        Uuid.parse(stringId),
+        Uuid.parse(orderId),
+        Uuid.parse(productId),
+        quantity,
+        cost
+    )
 }
 
 @Serializable
@@ -36,5 +37,5 @@ data class NewLineItem(
     @Serializable(with = UUIDSerializer::class)
     val productId: ProductId?,
     val quantity: Double,
-    val cost: Double,
+    val cost: Int,
 )
