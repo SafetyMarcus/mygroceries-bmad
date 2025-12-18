@@ -13,6 +13,7 @@ import kotlin.uuid.Uuid
 data class Order(
     @Serializable(with = UUIDSerializer::class)
     val id: OrderId? = Uuid.random(),
+    @Serializable(with = DateSerializer::class)
     val date: Instant,
 ) {
     constructor(stringId: String, date: Instant): this(Uuid.parse(stringId), date)

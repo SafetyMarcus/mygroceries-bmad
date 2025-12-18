@@ -7,11 +7,12 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import kotlin.uuid.toJavaUuid
+import kotlinx.datetime.*
 
 object OrderRepository {
     private fun toOrder(row: ResultRow) = Order(
         stringId = row[Orders.id].toString(),
-        date = row[Orders.date],
+        date = row[Orders.date].toKotlinInstant(),
     )
 
     fun create(order: NewOrder) = transaction {
