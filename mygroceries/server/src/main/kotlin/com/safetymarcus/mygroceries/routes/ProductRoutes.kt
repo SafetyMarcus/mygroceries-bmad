@@ -12,8 +12,6 @@ import com.safetymarcus.mygroceries.model.Product
 import com.safetymarcus.mygroceries.service.ProductService
 import com.safetymarcus.mygroceries.service.CategoryService
 
-
-
 fun Route.productRoutes(productService: ProductService, categoryService: CategoryService) {
     route("/products") {
         post {

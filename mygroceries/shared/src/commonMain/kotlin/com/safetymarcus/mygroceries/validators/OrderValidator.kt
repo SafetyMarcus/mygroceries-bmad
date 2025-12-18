@@ -13,5 +13,5 @@ fun NewOrder.validate() = date.validate()
 private fun OrderId?.validate() = takeIf { it != null }?.let { Validator.Valid } 
     ?: Validator.Invalid("Order ID cannot be null")
 
-private fun Instant.validate() = takeIf { it <= Clock.System.now() }?.let { Validator.Valid } 
+private fun Instant?.validate() = takeIf { it != null }?.takeIf { it <= Clock.System.now() }?.let { Validator.Valid } 
     ?: Validator.Invalid("Order date cannot be in the future")

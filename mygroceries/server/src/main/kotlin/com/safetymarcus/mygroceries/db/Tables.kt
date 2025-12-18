@@ -19,7 +19,7 @@ object Products : Table() {
 
 object Orders : Table("orders") {
     val id = uuid("id")
-    val date = timestamp("date")
+    val date = timestamp("date").nullable()
     
     override val primaryKey = PrimaryKey(id)
 }
