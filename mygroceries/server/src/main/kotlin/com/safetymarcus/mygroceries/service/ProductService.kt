@@ -3,23 +3,26 @@ package com.safetymarcus.mygroceries.service
 import com.safetymarcus.mygroceries.db.ProductRepository
 import com.safetymarcus.mygroceries.model.NewProduct
 import com.safetymarcus.mygroceries.model.Product
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlin.uuid.*
 
 class ProductService(
     private val productRepository: ProductRepository = ProductRepository
 ) {
-    fun create(name: String, categoryId: Uuid) = productRepository.create(name, categoryId.toString())
+    fun create(name: String, categoryId: Uuid) = productRepository.create(name, categoryId.toJavaUuid())
 
     fun readAll() = productRepository.readAll()
 
-    fun readById(id: Uuid) = productRepository.readById(id.toString())
+    fun readById(id: Uuid) = productRepository.readById(id.toJavaUuid())
 
     fun update(product: Product) = productRepository
         .update(product)
         .takeIf { it }
-        ?.let { productRepository.readById(product.id.toString()) }
+        ?.let { productRepository.readById(product.id!!.toJavaUuid()) }
 
-    fun delete(id: Uuid): Boolean = productRepository.delete(id.toString())
+    fun delete(id: Uuid): Boolean = productRepository.delete(id.toJavaUuid())
 
     context(call: ApplicationCall)
     suspend fun validateProductExists(productId: Uuid) {

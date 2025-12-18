@@ -1,7 +1,7 @@
 package com.safetymarcus.mygroceries.db
 
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.sql.kotlin.datetime.*
 import java.util.UUID
 
 object Categories : Table() {
@@ -18,10 +18,10 @@ object Products : Table() {
 }
 
 object Orders : Table("orders") {
-    val id = uuid("id").autoGenerate()
-    val orderDate = timestamp("order_date")
+    val id = uuid("id")
+    val date = timestamp("date")
     
-    override val primaryKey = PrimaryKey(id, name = "pk_orders")
+    override val primaryKey = PrimaryKey(id)
 }
 
 object LineItems : Table("line_items") {

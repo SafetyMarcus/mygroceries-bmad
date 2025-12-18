@@ -16,8 +16,20 @@ data class LineItem(
     val productId: ProductId?,
     val quantity: Double,
     val cost: Double,
-    val product: Product? = null
-)
+) {
+    constructor(
+        stringId: String,
+        orderId: String,
+        productId: String,
+        quantity: Double,
+        cost: Double): this(
+            Uuid.parse(stringId),
+            Uuid.parse(orderId),
+            Uuid.parse(productId),
+            quantity,
+            cost
+        )
+}
 
 @Serializable
 data class NewLineItem(
@@ -25,5 +37,4 @@ data class NewLineItem(
     val productId: ProductId?,
     val quantity: Double,
     val cost: Double,
-    val product: Product? = null
 )

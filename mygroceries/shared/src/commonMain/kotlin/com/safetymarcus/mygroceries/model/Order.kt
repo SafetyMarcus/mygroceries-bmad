@@ -6,15 +6,18 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonTransformingSerializer
 import com.safetymarcus.mygroceries.model.OrderId
-import java.time.Instant
-import java.util.*
+import kotlin.time.Instant
+import kotlin.uuid.Uuid
 
 @Serializable
 data class Order(
-    val id: OrderId? = OrderId.random(),
-    val orderDate: Instant,
-)
+    @Serializable(with = UUIDSerializer::class)
+    val id: OrderId? = Uuid.random(),
+    val date: Instant,
+) {
+    constructor(stringId: String, date: Instant): this(Uuid.parse(stringId), date)
+}
 
 data class NewOrder(
-    val orderDate: Instant,
+    val date: Instant,
 )

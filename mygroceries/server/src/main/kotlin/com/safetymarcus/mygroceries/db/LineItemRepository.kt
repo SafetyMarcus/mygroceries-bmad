@@ -6,55 +6,54 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
+import kotlin.uuid.toJavaUuid
 
 object LineItemRepository {
     private fun toLineItem(row: ResultRow) = LineItem(
-        id = row[LineItems.id],
-        orderId = row[LineItems.orderId],
-        productId = row[LineItems.productId],
+        stringId = row[LineItems.id].toString(),
+        orderId = row[LineItems.orderId].toString(),
+        productId = row[LineItems.productId].toString(),
         quantity = row[LineItems.quantity],
         cost = row[LineItems.cost].toDouble()
     )
 
-    fun create(orderId: String, lineItem: NewLineItem) = transaction {
+    fun create(orderId: UUID, lineItem: NewLineItem) = transaction {
         val id = UUID.randomUUID()
         LineItems.insert {
-            it[id] = id
-            it[orderId] = UUID.fromString(orderId)
-            it[productId] = lineItem.productId
-            it[quantity] = lineItem.quantity
-            it[cost] = lineItem.cost.toBigDecimal()
+            it[LineItems.id] = id
+            it[LineItems.orderId] = orderId
+            it[LineItems.productId] = lineItem.productId!!.toJavaUuid()
+            it[LineItems.quantity] = lineItem.quantity
+            it[LineItems.cost] = lineItem.cost.toBigDecimal()
         }
-        readById(id.toString())
+        readById(id)!!
     }
 
     fun readAll() = transaction { 
         LineItems.selectAll().map { toLineItem(it) } 
     }
 
-    fun readById(lineItemId: String) = transaction {
-        val id = UUID.fromString(lineItemId)
-        LineItems.select { LineItems.id eq id }
+    fun readById(lineItemId: UUID) = transaction {
+        LineItems.selectAll()
+            .where { LineItems.id eq lineItemId }
             .map { toLineItem(it) }
             .singleOrNull()
     }
 
-    fun findByOrderId(orderId: String) = transaction {
-        val id = UUID.fromString(orderId)
-        LineItems.select { LineItems.orderId eq id }.map { toLineItem(it) }
+    fun findByOrderId(orderId: UUID) = transaction {
+        LineItems.selectAll().where { LineItems.orderId eq orderId }.map { toLineItem(it) }
     }
 
     fun update(lineItem: LineItem) = transaction {
-        LineItems.update({ LineItems.id eq lineItem.id }) {
-            it[orderId] = lineItem.orderId
-            it[productId] = lineItem.productId
-            it[quantity] = lineItem.quantity
-            it[cost] = lineItem.cost.toBigDecimal()
+        LineItems.update({ LineItems.id eq lineItem.id!!.toJavaUuid() }) {
+            it[LineItems.orderId] = lineItem.orderId!!.toJavaUuid()
+            it[LineItems.productId] = lineItem.productId!!.toJavaUuid()
+            it[LineItems.quantity] = lineItem.quantity
+            it[LineItems.cost] = lineItem.cost.toBigDecimal()
         } > 0
     }
 
-    fun delete(lineItemId: String) = transaction { 
-        val id = UUID.fromString(lineItemId)
+    fun delete(lineItemId: UUID) = transaction { 
         LineItems.deleteWhere { LineItems.id eq id } > 0 
     }
 }

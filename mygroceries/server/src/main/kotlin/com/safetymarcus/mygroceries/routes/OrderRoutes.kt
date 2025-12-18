@@ -15,7 +15,7 @@ fun Route.orderRoutes(orderService: OrderService) {
         post {
             val newOrder = call.receive<NewOrder>()
             val createdOrder = orderService.createOrder(newOrder)
-            call.respond(HttpStatusCode.Created, createdOrder)
+            call.respond(HttpStatusCode.Created, createdOrder!!)
         }
 
         get {

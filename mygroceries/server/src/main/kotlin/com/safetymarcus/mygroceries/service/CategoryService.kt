@@ -3,6 +3,9 @@ package com.safetymarcus.mygroceries.service
 import com.safetymarcus.mygroceries.db.CategoryRepository
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlin.uuid.*
 
 class CategoryService(

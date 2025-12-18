@@ -52,7 +52,7 @@ fun Route.lineItemRoutes(
 
         delete("/{id}") {
             val id = call.getAndValidateUUID("id")
-            if (lineItemService.deleteLineItem(id.toString())) call.respond(HttpStatusCode.NoContent)
+            if (lineItemService.deleteLineItem(id)) call.respond(HttpStatusCode.NoContent)
             else call.respond(HttpStatusCode.NotFound)
         }
     }
@@ -61,13 +61,13 @@ fun Route.lineItemRoutes(
     route("/orders/{orderId}/lineitems") {
         post {
             val orderId = call.getAndValidateUUID("orderId")
-            context(call) {
-                productService.validateProductExists(updateLineItem.productId!!)
-                orderService.validateOrderExists(updateLineItem.orderId!!)
-            }
             val newLineItem = call.receive<NewLineItem>()
+            context(call) {
+                productService.validateProductExists(newLineItem.productId!!)
+                orderService.validateOrderExists(orderId)
+            }
             val createdLineItem = lineItemService.createLineItem(
-                orderId.toString(),
+                orderId,
                 newLineItem
             )
             call.respond(HttpStatusCode.Created, createdLineItem)

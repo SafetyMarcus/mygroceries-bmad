@@ -23,13 +23,14 @@ object CategoryRepository {
         readById(ID.toString())!!
     }
 
-    fun readAll(): List<Category> = transaction {
+    fun readAll() = transaction {
         Categories.selectAll().map { toCategory(it) }
     }
 
-    fun readById(id: String): Category? = transaction {
+    fun readById(id: String) = transaction {
         val uuid = UUID.fromString(id)
-        Categories.select { Categories.id eq uuid }
+        Categories.selectAll()
+            .where { Categories.id eq uuid }
             .map { toCategory(it) }
             .singleOrNull()
     }

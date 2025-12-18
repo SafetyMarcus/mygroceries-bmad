@@ -2,10 +2,9 @@ package com.safetymarcus.mygroceries.validators
 
 import com.safetymarcus.mygroceries.model.LineItem
 import com.safetymarcus.mygroceries.model.NewLineItem
-import com.safetymarcus.mygroceries.validators.ProductValidator
-import com.safetymarcus.mygroceries.validators.OrderValidator
 import com.safetymarcus.mygroceries.model.LineItemId
 import com.safetymarcus.mygroceries.model.ProductId
+import com.safetymarcus.mygroceries.model.OrderId
 
 fun LineItem.validate() = id.validate() + 
     productId.validate() + 

@@ -8,16 +8,16 @@ import kotlin.uuid.*
 class LineItemService(
     private val lineItemRepository: LineItemRepository,
 ) {
-    suspend fun createLineItem(orderId: String, lineItem: NewLineItem) = lineItemRepository.create(orderId, lineItem)
+    suspend fun createLineItem(orderId: Uuid, lineItem: NewLineItem) = lineItemRepository.create(orderId.toJavaUuid(), lineItem)
     
-    suspend fun getLineItem(id: Uuid) = lineItemRepository.readById(id.toString())
+    suspend fun getLineItem(id: Uuid) = lineItemRepository.readById(id.toJavaUuid())
     
-    suspend fun getLineItemsByOrder(orderId: Uuid) = lineItemRepository.findByOrderId(orderId.toString())
+    suspend fun getLineItemsByOrder(orderId: Uuid) = lineItemRepository.findByOrderId(orderId.toJavaUuid())
     
     suspend fun updateLineItem(lineItem: LineItem) = lineItemRepository
         .update(lineItem)
         .takeIf { it }
-        ?.let { lineItemRepository.readById(lineItem.id.toString()!!) }
+        ?.let { lineItemRepository.readById(lineItem.id!!.toJavaUuid()) }
     
-    suspend fun deleteLineItem(id: String) = lineItemRepository.delete(id)
+    suspend fun deleteLineItem(id: Uuid) = lineItemRepository.delete(id.toJavaUuid())
 }
