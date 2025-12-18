@@ -12,15 +12,6 @@ import com.safetymarcus.mygroceries.model.Product
 import com.safetymarcus.mygroceries.service.ProductService
 import com.safetymarcus.mygroceries.service.CategoryService
 
-context(call: ApplicationCall)
-suspend fun CategoryService.validateCategoryExists(categoryId: Uuid) {
-    val category = readById(categoryId)
-    if (category == null) {
-        call.respond(HttpStatusCode.BadRequest, "Category does not exist")
-        return
-    }
-}
-
 fun Route.productRoutes(productService: ProductService, categoryService: CategoryService) {
     route("/products") {
         post {

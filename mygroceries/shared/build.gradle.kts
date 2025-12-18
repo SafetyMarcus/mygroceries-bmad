@@ -8,6 +8,7 @@ plugins {
 kotlin {
     compilerOptions {
         optIn.add("kotlin.uuid.ExperimentalUuidApi")
+        optIn.add("kotlin.time.ExperimentalTime")
     }
     androidTarget {
         compilerOptions {
@@ -29,6 +30,7 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.koin.core) // Koin core is multiplatform
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)

@@ -234,33 +234,291 @@ components:
         categoryId:
           type: string
           format: uuid
+    NewOrder:
+      type: object
+      required:
+        - orderDate
+      properties:
+        orderDate:
+          type: string
+          format: date-time
+    Order:
+      type: object
+      required:
+        - id
+        - orderDate
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderDate:
+          type: string
+          format: date-time
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineItem'
+    NewLineItem:
+      type: object
+      required:
+        - productId
+        - quantity
+        - cost
+      properties:
+        productId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+          format: double
+          minimum: 0.01
+        cost:
+          type: number
+          format: double
+          minimum: 0
+    LineItem:
+      type: object
+      required:
+        - id
+        - orderId
+        - productId
+        - quantity
+        - cost
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+          format: double
+          minimum: 0.01
+        cost:
+          type: number
+          format: double
+          minimum: 0
+        product:
+          $ref: '#/components/schemas/Product'
 
   /orders:
     get:
-      summary: Retrieve orders, with optional filtering.
+      summary: Retrieve all orders with pagination
       parameters:
-        - name: categoryId
+        - name: offset
           in: query
           schema:
-            type: string
-            format: uuid
-        - name: productId
+            type: integer
+            minimum: 0
+            default: 0
+          description: Number of items to skip
+        - name: limit
           in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Maximum number of items to return
+      responses:
+        '200':
+          description: A list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid input
+  /orders/{id}:
+    get:
+      summary: Retrieve a single order by ID including its line items
+      parameters:
+        - name: id
+          in: path
+          required: true
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: A list of orders.
-    post:
-      summary: Create a new order with its line items.
-  /orders/{id}:
-    get:
-      summary: Retrieve a single order by ID.
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found
     put:
-      summary: Update an order's top-level details.
+      summary: Update an existing order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          description: Order updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid input or ID mismatch
+        '404':
+          description: Order not found
     delete:
-      summary: Delete an order and its line items.
+      summary: Delete an order and its line items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Order deleted successfully
+        '404':
+          description: Order not found
+  /orders/{orderId}/lineitems:
+    get:
+      summary: Get all line items for a specific order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of line items for the order
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LineItem'
+        '404':
+          description: Order not found
+    post:
+      summary: Add a line item to an order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewLineItem'
+      responses:
+        '201':
+          description: Line item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineItem'
+        '400':
+          description: Invalid input
+        '404':
+          description: Order or product not found
+  /lineitems/{id}:
+    get:
+      summary: Get a specific line item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Line item found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineItem'
+        '400':
+          description: Invalid UUID format
+        '404':
+          description: Line item not found
+    put:
+      summary: Update an existing line item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LineItem'
+      responses:
+        '200':
+          description: Line item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LineItem'
+        '400':
+          description: Invalid input, ID mismatch, or product/order not found
+        '404':
+          description: Line item not found
+    delete:
+      summary: Delete a line item
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Line item deleted successfully
+        '400':
+          description: Invalid UUID format
+        '404':
+          description: Line item not found
   /health:
     get:
       summary: Health check endpoint.

@@ -1,8 +1,11 @@
 import java.util.Properties
 
+val ktorVersion = "3.3.3"
+val exposedVersion = "1.0.0-rc-4"
+
 plugins {
     kotlin("jvm")
-    id("io.ktor.plugin") version "2.3.9"
+    id("io.ktor.plugin") version "3.3.3"
 }
 
 repositories {
@@ -11,19 +14,20 @@ repositories {
 
 dependencies {
     implementation(project(":shared"))
-    implementation("io.ktor:ktor-server-core-jvm:3.3.1")
-    implementation("io.ktor:ktor-server-netty-jvm:3.3.1")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:3.3.1")
-    implementation("io.ktor:ktor-server-request-validation-jvm:3.3.1")
-    implementation("io.ktor:ktor-server-status-pages-jvm:3.3.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:3.3.1")
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-request-validation-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:1.4.11")
 
     // Exposed for database access
-    implementation("org.jetbrains.exposed:exposed-core:0.49.0")
-    implementation("org.jetbrains.exposed:exposed-dao:0.49.0")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.49.0")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.49.0")
+    implementation(platform("org.jetbrains.exposed:exposed-bom:$exposedVersion"))
+    implementation("org.jetbrains.exposed:exposed-core")
+    implementation("org.jetbrains.exposed:exposed-dao")
+    implementation("org.jetbrains.exposed:exposed-jdbc")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
 
     // HikariCP for connection pooling
     implementation("com.zaxxer:HikariCP:5.1.0")
@@ -42,10 +46,10 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host-jvm:3.3.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("com.h2database:h2:2.2.224")
-    testImplementation("org.jetbrains.exposed:exposed-core:0.49.0")
-    testImplementation("org.jetbrains.exposed:exposed-dao:0.49.0")
-    testImplementation("org.jetbrains.exposed:exposed-jdbc:0.49.0")
-    testImplementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.49.0")
+    testImplementation("org.jetbrains.exposed:exposed-core")
+    testImplementation("org.jetbrains.exposed:exposed-dao")
+    testImplementation("org.jetbrains.exposed:exposed-jdbc")
+    testImplementation("org.jetbrains.exposed:exposed-kotlin-datetime")
     testImplementation(project(":server"))
 }
 
@@ -53,6 +57,7 @@ kotlin {
     sourceSets.all {
         languageSettings {
             optIn("kotlin.uuid.ExperimentalUuidApi")
+            optIn("kotlin.time.ExperimentalTime")
         }
         compilerOptions {
             freeCompilerArgs.add("-Xcontext-parameters")

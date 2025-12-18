@@ -2,17 +2,10 @@ package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Product
 import com.safetymarcus.mygroceries.db.Categories
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.*
 import java.util.UUID
-
-object Products : Table() {
-    val id = uuid("id")
-    val name = varchar("name", 255)
-    val categoryId = optReference("category_id", Categories.id, onDelete = ReferenceOption.CASCADE)
-    override val primaryKey = PrimaryKey(id)
-}
+import kotlin.uuid.toJavaUuid
 
 object ProductRepository {
     private fun toProduct(row: ResultRow) = Product(
@@ -21,33 +14,34 @@ object ProductRepository {
         categoryId = row[Products.categoryId].toString()
     )
 
-    fun create(name: String, categoryId: String) = transaction {
+    suspend fun create(name: String, categoryId: UUID) = dbQuery {
         val id = UUID.randomUUID()
         Products.insert {
             it[Products.id] = id
             it[Products.name] = name
-            it[Products.categoryId] = UUID.fromString(categoryId)
+            it[Products.categoryId] = categoryId
         }
         
-        readById(id.toString())!!
+        readById(id)!!
     }
 
-    fun readAll() = transaction { Products.selectAll().map { toProduct(it) } }
+    suspend fun readAll() = dbQuery { Products.selectAll().map { toProduct(it) } }
 
-    fun readById(id: String): Product? = transaction {
-        Products.select { Products.id eq UUID.fromString(id) }
+    suspend fun readById(id: UUID): Product? = dbQuery {
+        Products.selectAll()
+            .where { Products.id eq id }
             .map { toProduct(it) }
             .singleOrNull()
     }
 
-    fun update(product: Product) = transaction {
-        Products.update({ Products.id eq UUID.fromString(product.id.toString()) }) {
-            it[name] = product.name
-            it[categoryId] = UUID.fromString(product.categoryId.toString())
+    suspend fun update(product: Product) = dbQuery {
+        Products.update({ Products.id eq product.id!!.toJavaUuid() }) {
+            it[Products.name] = product.name
+            it[Products.categoryId] = UUID.fromString(product.categoryId.toString())
         } > 0
     }
 
-    fun delete(id: String) = transaction { Products.deleteWhere { Products.id eq UUID.fromString(id) } > 0 }
+    suspend fun delete(id: UUID) = dbQuery { Products.deleteWhere { Products.id eq id } > 0 }
 
-    fun deleteAll() = transaction { Products.deleteAll() }
+    suspend fun deleteAll() = dbQuery { Products.deleteAll() }
 }
