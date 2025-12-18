@@ -2,20 +2,18 @@ package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Order
 import com.safetymarcus.mygroceries.model.NewOrder
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.*
 import java.util.*
 import kotlin.uuid.toJavaUuid
-import kotlinx.datetime.*
 
 object OrderRepository {
     private fun toOrder(row: ResultRow) = Order(
         stringId = row[Orders.id].toString(),
-        date = row[Orders.date].toKotlinInstant(),
+        date = row[Orders.date],
     )
 
-    fun create(order: NewOrder) = transaction {
+    suspend fun create(order: NewOrder) = dbQuery {
         val id = UUID.randomUUID()
         Orders.insert {
             it[Orders.id] = id
@@ -24,28 +22,22 @@ object OrderRepository {
         readById(id)
     }
 
-    fun readAll() = transaction { 
-        Orders.selectAll().map { toOrder(it) } 
-    }
+    suspend fun readAll() = dbQuery { Orders.selectAll().map { toOrder(it) } }
 
-    fun readById(id: UUID) = transaction {
+    suspend fun readById(id: UUID) = dbQuery {
         Orders.selectAll()
             .where { Orders.id eq id }
             .map { toOrder(it) }
             .singleOrNull()
     }
 
-    fun update(order: Order) = transaction {
+    suspend fun update(order: Order) = dbQuery {
         Orders.update({ Orders.id eq order.id!!.toJavaUuid() }) {
             it[Orders.date] = order.date
         } > 0
     }
 
-    fun delete(id: UUID) = transaction { 
-        Orders.deleteWhere { Orders.id eq id } > 0 
-    }
+    suspend fun delete(id: UUID) = dbQuery { Orders.deleteWhere { Orders.id eq id } > 0 }
 
-    fun deleteAll() = transaction { 
-        Orders.deleteAll() 
-    }
+    suspend fun deleteAll() = dbQuery { Orders.deleteAll() }
 }

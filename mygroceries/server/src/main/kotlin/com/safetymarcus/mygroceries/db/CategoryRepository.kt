@@ -2,10 +2,9 @@ package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Category
 import com.safetymarcus.mygroceries.model.NewCategory
-import java.util.UUID
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.*
+import java.util.*
 
 object CategoryRepository {
     private fun toCategory(row: ResultRow) = Category(
@@ -13,21 +12,19 @@ object CategoryRepository {
         name = row[Categories.name]
     )
     
-    fun create(category: NewCategory) = transaction {
-        val ID = UUID.randomUUID()
+    suspend fun create(category: NewCategory) = dbQuery {
+        val id = UUID.randomUUID()
         Categories.insert {
-            it[id] = ID
-            it[name] = category.name
+            it[Categories.id] = id
+            it[Categories.name] = category.name
         }
         
-        readById(ID.toString())!!
+        readById(id.toString())!!
     }
 
-    fun readAll() = transaction {
-        Categories.selectAll().map { toCategory(it) }
-    }
+    suspend fun readAll() = dbQuery { Categories.selectAll().map { toCategory(it) } }
 
-    fun readById(id: String) = transaction {
+    suspend fun readById(id: String) = dbQuery {
         val uuid = UUID.fromString(id)
         Categories.selectAll()
             .where { Categories.id eq uuid }
@@ -35,16 +32,16 @@ object CategoryRepository {
             .singleOrNull()
     }
 
-    fun update(category: Category) = transaction {
+    suspend fun update(category: Category) = dbQuery {
         Categories.update({ Categories.id eq UUID.fromString(category.id?.toString()) }) {
-            it[name] = category.name
+            it[Categories.name] = category.name
         } > 0
     }
 
-    fun delete(id: String) = transaction {
+    suspend fun delete(id: String) = dbQuery {
         val uuid = UUID.fromString(id)
         Categories.deleteWhere { Categories.id eq uuid } > 0
     }
 
-    fun deleteAll() = transaction { Categories.deleteAll() }
+    suspend fun deleteAll() = dbQuery { Categories.deleteAll() }
 }

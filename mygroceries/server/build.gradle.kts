@@ -1,7 +1,7 @@
 import java.util.Properties
 
 val ktorVersion = "3.3.3"
-val exposedVersion = "0.60.0"
+val exposedVersion = "1.0.0-rc-4"
 
 plugins {
     kotlin("jvm")
@@ -23,10 +23,11 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.11")
 
     // Exposed for database access
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
+    implementation(platform("org.jetbrains.exposed:exposed-bom:$exposedVersion"))
+    implementation("org.jetbrains.exposed:exposed-core")
+    implementation("org.jetbrains.exposed:exposed-dao")
+    implementation("org.jetbrains.exposed:exposed-jdbc")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
 
     // HikariCP for connection pooling
     implementation("com.zaxxer:HikariCP:5.1.0")
@@ -45,10 +46,10 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host-jvm:3.3.1")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("com.h2database:h2:2.2.224")
-    testImplementation("org.jetbrains.exposed:exposed-core:0.49.0")
-    testImplementation("org.jetbrains.exposed:exposed-dao:0.49.0")
-    testImplementation("org.jetbrains.exposed:exposed-jdbc:0.49.0")
-    testImplementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.49.0")
+    testImplementation("org.jetbrains.exposed:exposed-core")
+    testImplementation("org.jetbrains.exposed:exposed-dao")
+    testImplementation("org.jetbrains.exposed:exposed-jdbc")
+    testImplementation("org.jetbrains.exposed:exposed-kotlin-datetime")
     testImplementation(project(":server"))
 }
 

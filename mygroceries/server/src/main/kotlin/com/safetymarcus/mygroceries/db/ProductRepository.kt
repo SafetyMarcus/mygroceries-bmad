@@ -2,9 +2,8 @@ package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.Product
 import com.safetymarcus.mygroceries.db.Categories
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.*
 import java.util.UUID
 import kotlin.uuid.toJavaUuid
 
@@ -15,7 +14,7 @@ object ProductRepository {
         categoryId = row[Products.categoryId].toString()
     )
 
-    fun create(name: String, categoryId: UUID) = transaction {
+    suspend fun create(name: String, categoryId: UUID) = dbQuery {
         val id = UUID.randomUUID()
         Products.insert {
             it[Products.id] = id
@@ -26,23 +25,23 @@ object ProductRepository {
         readById(id)!!
     }
 
-    fun readAll() = transaction { Products.selectAll().map { toProduct(it) } }
+    suspend fun readAll() = dbQuery { Products.selectAll().map { toProduct(it) } }
 
-    fun readById(id: UUID): Product? = transaction {
+    suspend fun readById(id: UUID): Product? = dbQuery {
         Products.selectAll()
             .where { Products.id eq id }
             .map { toProduct(it) }
             .singleOrNull()
     }
 
-    fun update(product: Product) = transaction {
+    suspend fun update(product: Product) = dbQuery {
         Products.update({ Products.id eq product.id!!.toJavaUuid() }) {
-            it[name] = product.name
-            it[categoryId] = UUID.fromString(product.categoryId.toString())
+            it[Products.name] = product.name
+            it[Products.categoryId] = UUID.fromString(product.categoryId.toString())
         } > 0
     }
 
-    fun delete(id: UUID) = transaction { Products.deleteWhere { Products.id eq id } > 0 }
+    suspend fun delete(id: UUID) = dbQuery { Products.deleteWhere { Products.id eq id } > 0 }
 
-    fun deleteAll() = transaction { Products.deleteAll() }
+    suspend fun deleteAll() = dbQuery { Products.deleteAll() }
 }

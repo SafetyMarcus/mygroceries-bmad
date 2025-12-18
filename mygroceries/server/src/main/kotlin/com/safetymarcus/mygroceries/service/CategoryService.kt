@@ -11,18 +11,18 @@ import kotlin.uuid.*
 class CategoryService(
     private val categoryRepository: CategoryRepository = CategoryRepository,
 ) {
-    fun create(categoryName: NewCategory) = categoryRepository.create(categoryName)
+    suspend fun create(categoryName: NewCategory) = categoryRepository.create(categoryName)
 
-    fun readAll() = categoryRepository.readAll()
+    suspend fun readAll() = categoryRepository.readAll()
 
-    fun readById(id: Uuid) = categoryRepository.readById(id.toString())
+    suspend fun readById(id: Uuid) = categoryRepository.readById(id.toString())
 
-    fun update(category: Category) = categoryRepository
+    suspend fun update(category: Category) = categoryRepository
         .update(category)
         .takeIf { it }
         ?.let { categoryRepository.readById(category.id.toString()!!) }
 
-    fun delete(id: Uuid) = categoryRepository.delete(id.toString())
+    suspend fun delete(id: Uuid) = categoryRepository.delete(id.toString())
 
     context(call: ApplicationCall)
     suspend fun validateCategoryExists(categoryId: Uuid) {

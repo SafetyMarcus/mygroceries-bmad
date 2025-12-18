@@ -2,9 +2,8 @@ package com.safetymarcus.mygroceries.db
 
 import com.safetymarcus.mygroceries.model.LineItem
 import com.safetymarcus.mygroceries.model.NewLineItem
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.*
 import java.util.*
 import kotlin.uuid.toJavaUuid
 
@@ -17,7 +16,7 @@ object LineItemRepository {
         cost = row[LineItems.cost].toDouble()
     )
 
-    fun create(orderId: UUID, lineItem: NewLineItem) = transaction {
+    suspend fun create(orderId: UUID, lineItem: NewLineItem) = dbQuery {
         val id = UUID.randomUUID()
         LineItems.insert {
             it[LineItems.id] = id
@@ -29,22 +28,22 @@ object LineItemRepository {
         readById(id)!!
     }
 
-    fun readAll() = transaction { 
+    suspend fun readAll() = dbQuery { 
         LineItems.selectAll().map { toLineItem(it) } 
     }
 
-    fun readById(lineItemId: UUID) = transaction {
+    suspend fun readById(lineItemId: UUID) = dbQuery {
         LineItems.selectAll()
             .where { LineItems.id eq lineItemId }
             .map { toLineItem(it) }
             .singleOrNull()
     }
 
-    fun findByOrderId(orderId: UUID) = transaction {
+    suspend fun findByOrderId(orderId: UUID) = dbQuery {
         LineItems.selectAll().where { LineItems.orderId eq orderId }.map { toLineItem(it) }
     }
 
-    fun update(lineItem: LineItem) = transaction {
+    suspend fun update(lineItem: LineItem) = dbQuery {
         LineItems.update({ LineItems.id eq lineItem.id!!.toJavaUuid() }) {
             it[LineItems.orderId] = lineItem.orderId!!.toJavaUuid()
             it[LineItems.productId] = lineItem.productId!!.toJavaUuid()
@@ -53,7 +52,7 @@ object LineItemRepository {
         } > 0
     }
 
-    fun delete(lineItemId: UUID) = transaction { 
+    suspend fun delete(lineItemId: UUID) = dbQuery { 
         LineItems.deleteWhere { LineItems.id eq id } > 0 
     }
 }

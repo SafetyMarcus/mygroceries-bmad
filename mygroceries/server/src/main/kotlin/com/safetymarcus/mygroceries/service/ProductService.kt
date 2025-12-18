@@ -11,18 +11,18 @@ import kotlin.uuid.*
 class ProductService(
     private val productRepository: ProductRepository = ProductRepository
 ) {
-    fun create(name: String, categoryId: Uuid) = productRepository.create(name, categoryId.toJavaUuid())
+    suspend fun create(name: String, categoryId: Uuid) = productRepository.create(name, categoryId.toJavaUuid())
 
-    fun readAll() = productRepository.readAll()
+    suspend fun readAll() = productRepository.readAll()
 
-    fun readById(id: Uuid) = productRepository.readById(id.toJavaUuid())
+    suspend fun readById(id: Uuid) = productRepository.readById(id.toJavaUuid())
 
-    fun update(product: Product) = productRepository
+    suspend fun update(product: Product) = productRepository
         .update(product)
         .takeIf { it }
         ?.let { productRepository.readById(product.id!!.toJavaUuid()) }
 
-    fun delete(id: Uuid): Boolean = productRepository.delete(id.toJavaUuid())
+    suspend fun delete(id: Uuid): Boolean = productRepository.delete(id.toJavaUuid())
 
     context(call: ApplicationCall)
     suspend fun validateProductExists(productId: Uuid) {
