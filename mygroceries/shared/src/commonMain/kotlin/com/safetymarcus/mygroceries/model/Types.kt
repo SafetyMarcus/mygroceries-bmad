@@ -2,7 +2,16 @@ package com.safetymarcus.mygroceries.model
 
 import kotlin.uuid.*
 
-typealias ProductId = Uuid
-typealias CategoryId = Uuid
-typealias ProductName = String
+//Categories
 typealias CategoryName = String
+typealias CategoryId = Uuid
+
+//Line Items
+typealias LineItemId = Uuid
+
+//Orders
+typealias OrderId = Uuid
+
+//Products
+typealias ProductName = String
+typealias ProductId = Uuid

@@ -7,13 +7,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
-object Products : Table() {
-    val id = uuid("id")
-    val name = varchar("name", 255)
-    val categoryId = optReference("category_id", Categories.id, onDelete = ReferenceOption.CASCADE)
-    override val primaryKey = PrimaryKey(id)
-}
-
 object ProductRepository {
     private fun toProduct(row: ResultRow) = Product(
         stringId = row[Products.id].toString(),

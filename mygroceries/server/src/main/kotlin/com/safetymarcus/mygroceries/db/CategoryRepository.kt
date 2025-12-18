@@ -7,12 +7,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object Categories : Table() {
-    val id = uuid("id")
-    val name = varchar("name", 255)
-    override val primaryKey = PrimaryKey(id)
-}
-
 object CategoryRepository {
     private fun toCategory(row: ResultRow) = Category(
         stringId = row[Categories.id].toString(),
