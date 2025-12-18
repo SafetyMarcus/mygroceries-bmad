@@ -23,9 +23,8 @@ import io.ktor.server.application.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlinx.coroutines.runBlocking
 import kotlin.uuid.*
-
-
 
 class CategoryRoutesTest {
 
@@ -49,7 +48,7 @@ class CategoryRoutesTest {
     }
 
     @AfterTest
-    fun tearDown() {
+    fun tearDown() = runBlocking {
         CategoryRepository.deleteAll()
         Database.close()
     }

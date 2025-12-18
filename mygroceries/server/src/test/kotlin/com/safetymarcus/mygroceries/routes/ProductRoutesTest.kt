@@ -17,6 +17,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import kotlin.test.*
 import kotlin.uuid.*
+import kotlinx.coroutines.runBlocking
 
 class ProductRoutesTest {
     private lateinit var testCategory: Category
@@ -47,7 +48,7 @@ class ProductRoutesTest {
     }
 
     @AfterTest
-    fun tearDown() {
+    fun tearDown() = runBlocking {
         ProductRepository.deleteAll()
         CategoryRepository.deleteAll()
         Database.close()

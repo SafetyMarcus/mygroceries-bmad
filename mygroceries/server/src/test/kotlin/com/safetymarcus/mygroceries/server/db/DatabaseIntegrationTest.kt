@@ -4,12 +4,10 @@ package com.safetymarcus.mygroceries.server.db
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.*
+import org.jetbrains.exposed.v1.core.*
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -79,7 +77,7 @@ class DatabaseIntegrationTest {
     fun `flyway migrations create expected schema`() {
         transaction {
             // Verify that a table created by Flyway exists
-            val tables = org.jetbrains.exposed.sql.transactions.transaction {
+            val tables = org.jetbrains.exposed.v1.jdbc.transactions.transaction {
                 val schema = object : Table("information_schema.tables") {
                     val name = varchar("table_name", 255)
                     val tableSchema = varchar("table_schema", 255)
@@ -120,8 +118,8 @@ class DatabaseIntegrationTest {
 
             // Insert a new category with a UUID
             Categories.insert {
-                it[id] = testUuid
-                it[name] = categoryName
+                it[Categories.id] = testUuid
+                it[Categories.name] = categoryName
             }
 
             // Retrieve the category by UUID

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import kotlin.uuid.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.runBlocking
 
 class CategoryServiceTest {
 
@@ -16,7 +17,7 @@ class CategoryServiceTest {
     private val categoryService = CategoryService(categoryRepository)
 
     @Test
-    fun `create category with valid data`() {
+    fun `create category with valid data`() = runBlocking {
         val category = NewCategory(name = "Fruits")
         coEvery { categoryRepository.create(any()) } returns Category(name = "Fruits")
         val result = categoryService.create(category)
@@ -24,7 +25,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    fun `get category by valid id`() {
+    fun `get category by valid id`() = runBlocking {
         val id = Uuid.random()
         val category = Category(id = id, name = "Fruits")
         coEvery { categoryRepository.readById(id.toString()) } returns category
@@ -33,7 +34,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    fun `update category with valid data`() {
+    fun `update category with valid data`() = runBlocking {
         val id = Uuid.random()
         val category = Category(id = id, name = "Vegetables")
         coEvery { categoryRepository.update(category) } returns true
@@ -43,7 +44,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    fun `delete category with valid id`() {
+    fun `delete category with valid id`() = runBlocking {
         val id = Uuid.random()
         coEvery { categoryRepository.delete(id.toString()) } returns true
         val result = categoryService.delete(id)
