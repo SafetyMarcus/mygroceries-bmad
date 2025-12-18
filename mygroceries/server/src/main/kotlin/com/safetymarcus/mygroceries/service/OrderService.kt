@@ -20,4 +20,12 @@ class OrderService(
         ?.let { orderRepository.readById(order.id.toString()) }
     
     suspend fun deleteOrder(id: Uuid) = orderRepository.delete(id.toString())
+
+    context(call: ApplicationCall)
+    suspend fun validateOrderExists(orderId: Uuid) {
+        if (getOrder(orderId) == null) {
+            call.respond(HttpStatusCode.BadRequest, "Order does not exist")
+            return
+        }
+    }
 }

@@ -22,8 +22,6 @@ data class LineItem(
 @Serializable
 data class NewLineItem(
     @Serializable(with = UUIDSerializer::class)
-    val orderId: OrderId?,
-    @Serializable(with = UUIDSerializer::class)
     val productId: ProductId?,
     val quantity: Double,
     val cost: Double,

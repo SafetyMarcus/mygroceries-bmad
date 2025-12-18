@@ -8,7 +8,7 @@ import kotlin.uuid.*
 class LineItemService(
     private val lineItemRepository: LineItemRepository,
 ) {
-    suspend fun createLineItem(lineItem: NewLineItem) = lineItemRepository.create(lineItem)
+    suspend fun createLineItem(orderId: String, lineItem: NewLineItem) = lineItemRepository.create(orderId, lineItem)
     
     suspend fun getLineItem(id: Uuid) = lineItemRepository.readById(id.toString())
     

@@ -16,11 +16,11 @@ object LineItemRepository {
         cost = row[LineItems.cost].toDouble()
     )
 
-    fun create(lineItem: NewLineItem) = transaction {
+    fun create(orderId: String, lineItem: NewLineItem) = transaction {
         val id = UUID.randomUUID()
         LineItems.insert {
             it[id] = id
-            it[orderId] = lineItem.orderId
+            it[orderId] = UUID.fromString(orderId)
             it[productId] = lineItem.productId
             it[quantity] = lineItem.quantity
             it[cost] = lineItem.cost.toBigDecimal()

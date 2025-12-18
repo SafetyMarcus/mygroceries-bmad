@@ -10,14 +10,22 @@ class ProductService(
 ) {
     fun create(name: String, categoryId: Uuid) = productRepository.create(name, categoryId.toString())
 
-    fun readAll(): List<Product> = productRepository.readAll()
+    fun readAll() = productRepository.readAll()
 
-    fun readById(id: Uuid): Product? = productRepository.readById(id.toString())
+    fun readById(id: Uuid) = productRepository.readById(id.toString())
 
-    fun update(product: Product): Product? = productRepository
+    fun update(product: Product) = productRepository
         .update(product)
         .takeIf { it }
         ?.let { productRepository.readById(product.id.toString()) }
 
     fun delete(id: Uuid): Boolean = productRepository.delete(id.toString())
+
+    context(call: ApplicationCall)
+    suspend fun validateProductExists(productId: Uuid) {
+        if (readById(productId) == null) {
+            call.respond(HttpStatusCode.BadRequest, "Product does not exist")
+            return
+        }
+    }
 }
