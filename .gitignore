@@ -7,3 +7,4 @@ mygroceries/server/build/*
 mygroceries/shared/build/*
 mygroceries/web/build/*
 mygroceries/androidApp/build/*
+mygroceries/.idea/*
