@@ -8,3 +8,4 @@ mygroceries/shared/build/*
 mygroceries/web/build/*
 mygroceries/androidApp/build/*
 mygroceries/.idea/*
+*.DS_Store
