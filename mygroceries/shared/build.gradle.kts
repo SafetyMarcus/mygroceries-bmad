@@ -1,7 +1,8 @@
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
-
+    id("com.android.kotlin.multiplatform.library")
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinxSerialization)
 }
 
@@ -10,9 +11,12 @@ kotlin {
         optIn.add("kotlin.uuid.ExperimentalUuidApi")
         optIn.add("kotlin.time.ExperimentalTime")
     }
-    androidTarget {
+    android {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            namespace = "com.safetymarcus.mygroceries.shared"
+            compileSdk = 34
+            minSdk = 24
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         }
     }
     iosX64()
@@ -24,13 +28,16 @@ kotlin {
     }
 
     sourceSets {
-        commonMain.dependencies {
-            // Only truly common (non-UI) dependencies here
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.koin.core) // Koin core is multiplatform
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.koin.core) // Koin core is multiplatform
+                implementation(libs.kotlinx.datetime)
+                implementation(compose.material3)
+                implementation(libs.navigation.compose)
+            }
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -45,13 +52,5 @@ kotlin {
         jsMain.dependencies {
             // No Compose dependencies here
         }
-    }
-}
-
-android {
-    namespace = "com.safetymarcus.mygroceries.shared"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
     }
 }
