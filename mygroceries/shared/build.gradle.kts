@@ -67,10 +67,5 @@ kotlin {
         jvmMain.dependencies {
             // JVM-specific dependencies (non-UI)
         }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
-        }
     }
 }
