@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
-
+    id("com.android.kotlin.multiplatform.library")
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinxSerialization)
 }
 
@@ -10,27 +13,49 @@ kotlin {
         optIn.add("kotlin.uuid.ExperimentalUuidApi")
         optIn.add("kotlin.time.ExperimentalTime")
     }
-    androidTarget {
+    android {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            namespace = "com.safetymarcus.mygroceries.shared"
+            compileSdk = 34
+            minSdk = 24
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         }
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-    jvm()
-    js() {
-        browser()
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "ComposeApp"
+        }
     }
+    jvm()
+    js {
+        browser()
+        useEsModules()
+    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs { browser() }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlin.uuid.ExperimentalUuidApi")
+                optIn("kotlin.time.ExperimentalTime")
+            }
+        }
+
         commonMain.dependencies {
-            // Only truly common (non-UI) dependencies here
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.koin.core) // Koin core is multiplatform
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+            implementation(libs.kotlinx.datetime)
+            implementation(compose.material3)
+            api(libs.navigation.compose)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -42,16 +67,5 @@ kotlin {
         jvmMain.dependencies {
             // JVM-specific dependencies (non-UI)
         }
-        jsMain.dependencies {
-            // No Compose dependencies here
-        }
-    }
-}
-
-android {
-    namespace = "com.safetymarcus.mygroceries.shared"
-    compileSdk = 34
-    defaultConfig {
-        minSdk = 24
     }
 }

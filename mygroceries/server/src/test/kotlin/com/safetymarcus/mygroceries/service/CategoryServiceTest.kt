@@ -8,7 +8,6 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import kotlin.uuid.*
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 
 class CategoryServiceTest {
