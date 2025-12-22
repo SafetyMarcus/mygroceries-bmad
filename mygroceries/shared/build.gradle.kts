@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
     id("com.android.kotlin.multiplatform.library")
@@ -29,21 +31,31 @@ kotlin {
         }
     }
     jvm()
-    js() {
+    js {
         browser()
+        useEsModules()
     }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs { browser() }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.core)
-                implementation(libs.ktor.client.content.negotiation)
-                implementation(libs.ktor.serialization.kotlinx.json)
-                implementation(libs.koin.core) // Koin core is multiplatform
-                implementation(libs.kotlinx.datetime)
-                implementation(compose.material3)
-                implementation(libs.navigation.compose)
+        all {
+            languageSettings {
+                optIn("kotlin.uuid.ExperimentalUuidApi")
+                optIn("kotlin.time.ExperimentalTime")
             }
+        }
+
+        commonMain.dependencies {
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.koin.core) // Koin core is multiplatform
+            implementation(libs.kotlinx.datetime)
+            implementation(compose.material3)
+            api(libs.navigation.compose)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -54,9 +66,6 @@ kotlin {
         }
         jvmMain.dependencies {
             // JVM-specific dependencies (non-UI)
-        }
-        jsMain.dependencies {
-            // No Compose dependencies here
         }
     }
 }

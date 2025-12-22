@@ -9,12 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.safetymarcus.mygroceries.presentation.navigation.Navigation
 import com.safetymarcus.mygroceries.presentation.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainView() = AppTheme {
+fun MainView(controller: NavHostController? = null) = AppTheme {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -26,7 +28,7 @@ fun MainView() = AppTheme {
         }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            Navigation()
+            Navigation(controller ?: rememberNavController())
         }
     }
 }
