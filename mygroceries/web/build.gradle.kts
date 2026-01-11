@@ -48,3 +48,7 @@ kotlin {
 tasks.named("wasmJsBrowserDevelopmentRun") {
     dependsOn("wasmJsProductionExecutableCompileSync")
 }
+
+tasks.named("wasmJsBrowserProductionWebpack") {
+    dependsOn("wasmJsDevelopmentExecutableCompileSync")
+}

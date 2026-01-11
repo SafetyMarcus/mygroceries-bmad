@@ -10,3 +10,4 @@ mygroceries/web/build/*
 mygroceries/androidApp/build/*
 mygroceries/.idea/*
 mygroceries/iosApp/iosApp.xcodeproj/*
+seed/*

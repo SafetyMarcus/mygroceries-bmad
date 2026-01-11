@@ -50,37 +50,38 @@ private fun CategoriesChart(state: CategorySpendingState.Success) {
     val values = remember { state.data.map { it.totalSpend.toFloat() } }
     val categories = remember { state.data.map { it.categoryName } }
     val total = remember(values) { values.sum() }
-
+    val colors = remember(categories.size) {
+        List(categories.size) { i ->
+            Color.hsv(
+                hue = (i.toFloat() / categories.size) * 360f,
+                saturation = 0.7f,
+                value = 0.9f
+            )
+        }
+    }
 
     Row {
-        Chart(values, total)
+        Chart(values, total, colors)
         Spacer(Modifier.size(16.dp))
-        Legend(categories)
+        Legend(categories, colors)
     }
 }
-
-private val chartColors = listOf(
-    Color(0xFFF44336),
-    Color(0xFF2196F3),
-    Color(0xFF4CAF50),
-    Color(0xFFFFC107),
-    Color(0xFF9C27B0)
-)
 
 @OptIn(ExperimentalKoalaPlotApi::class)
 @Composable
 private fun Chart(
     values: List<Float>,
-    total: Float
+    total: Float,
+    colors: List<Color>
 ) = PieChart(
     values = values,
-    slice = { DefaultSlice(color = chartColors[it]) },
+    slice = { DefaultSlice(color = colors[it]) },
     label = { i ->
         val percentage = (values[i] / total) * 100
         val formattedPercentage = ((percentage * 10).roundToInt() / 10f).toString()
-        val total = toDollarsCents(values[i])
+        val totalAmount = toDollarsCents(values[i])
         Text(
-            text = "$$total ($formattedPercentage%)",
+            text = "$$totalAmount ($formattedPercentage%)",
             style = MaterialTheme.typography.labelSmall,
             color = Color.White
         )
@@ -90,6 +91,7 @@ private fun Chart(
 @Composable
 private fun Legend(
     categories: List<CategoryName>,
+    colors: List<Color>
 ) = Column {
     categories.forEachIndexed { i, category ->
         Row(
@@ -99,7 +101,7 @@ private fun Legend(
             Box(
                 modifier = Modifier
                     .size(12.dp)
-                    .background(chartColors[i], shape = CircleShape)
+                    .background(colors[i], shape = CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -126,5 +128,3 @@ private fun Error(state: CategorySpendingState.Error) {
         color = MaterialTheme.colorScheme.error
     )
 }
-
-
