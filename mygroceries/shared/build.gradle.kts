@@ -49,20 +49,20 @@ kotlin {
         }
 
         commonMain.dependencies {
+            api(libs.navigation.compose)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.koin.core) // Koin core is multiplatform
             implementation(libs.kotlinx.datetime)
             implementation(compose.material3)
-            api(libs.navigation.compose)
+            implementation(libs.koala.core)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            // Add iOS-specific Compose Multiplatform dependencies here if needed
         }
         jvmMain.dependencies {
             // JVM-specific dependencies (non-UI)

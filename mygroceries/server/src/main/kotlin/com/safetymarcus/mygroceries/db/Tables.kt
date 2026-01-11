@@ -2,7 +2,6 @@ package com.safetymarcus.mygroceries.db
 
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.datetime.timestamp
-import java.util.UUID
 
 object Categories : Table() {
     val id = uuid("id")
