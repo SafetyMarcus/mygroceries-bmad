@@ -1,7 +1,5 @@
 package com.safetymarcus.mygroceries.presentation.ui.components
 
-import CategorySpendingChart
-import CategorySpendingState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable

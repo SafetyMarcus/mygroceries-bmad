@@ -1,8 +1,9 @@
+package com.safetymarcus.mygroceries.presentation.ui.components
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.safetymarcus.mygroceries.model.CategoryName
@@ -61,7 +61,7 @@ private fun CategoriesChart(state: CategorySpendingState.Success) {
     }
 }
 
-private val colors = listOf(
+private val chartColors = listOf(
     Color(0xFFF44336),
     Color(0xFF2196F3),
     Color(0xFF4CAF50),
@@ -71,32 +71,28 @@ private val colors = listOf(
 
 @OptIn(ExperimentalKoalaPlotApi::class)
 @Composable
-private fun RowScope.Chart(
+private fun Chart(
     values: List<Float>,
     total: Float
-) {
-    val chartColors = remember { colors }
-    PieChart(
-        values = values,
-        slice = { DefaultSlice(color = chartColors[it]) },
-        label = { i ->
-            val percentage = (values[i] / total) * 100
-            val formattedPercentage = ((percentage * 10).roundToInt() / 10f).toString()
-            val total = toDollarsCents(values[i])
-            Text(
-                text = "$$total ($formattedPercentage%)",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White
-            )
-        }
-    )
-}
+) = PieChart(
+    values = values,
+    slice = { DefaultSlice(color = chartColors[it]) },
+    label = { i ->
+        val percentage = (values[i] / total) * 100
+        val formattedPercentage = ((percentage * 10).roundToInt() / 10f).toString()
+        val total = toDollarsCents(values[i])
+        Text(
+            text = "$$total ($formattedPercentage%)",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White
+        )
+    }
+)
 
 @Composable
 private fun Legend(
     categories: List<CategoryName>,
 ) = Column {
-    val chartColor = remember { colors }
     categories.forEachIndexed { i, category ->
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -105,7 +101,7 @@ private fun Legend(
             Box(
                 modifier = Modifier
                     .size(12.dp)
-                    .background(chartColor[i], shape = CircleShape)
+                    .background(chartColors[i], shape = CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
