@@ -61,10 +61,7 @@ fun Application.module() {
         exception<RequestValidationException> { call, cause ->
             call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
         }
-        exception<Throwable> { call, cause ->
-            call.respond(HttpStatusCode.InternalServerError, "Internal Server Error: ${cause.localizedMessage}")
-        }
-    }
+    }   
 
     val categoryService = CategoryService(CategoryRepository)
     val productService = ProductService(ProductRepository)
