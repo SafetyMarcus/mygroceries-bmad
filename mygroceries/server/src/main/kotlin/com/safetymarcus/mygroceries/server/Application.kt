@@ -1,34 +1,46 @@
 package com.safetymarcus.mygroceries.server
 
+import com.safetymarcus.mygroceries.db.CategoryRepository
+import com.safetymarcus.mygroceries.db.LineItemRepository
+import com.safetymarcus.mygroceries.db.OrderRepository
+import com.safetymarcus.mygroceries.db.ProductRepository
+import com.safetymarcus.mygroceries.model.Category
+import com.safetymarcus.mygroceries.model.LineItem
+import com.safetymarcus.mygroceries.model.NewCategory
+import com.safetymarcus.mygroceries.model.NewLineItem
+import com.safetymarcus.mygroceries.model.NewOrder
+import com.safetymarcus.mygroceries.model.NewProduct
+import com.safetymarcus.mygroceries.model.Order
+import com.safetymarcus.mygroceries.model.Product
+import com.safetymarcus.mygroceries.routes.categoryRoutes
+import com.safetymarcus.mygroceries.routes.lineItemRoutes
+import com.safetymarcus.mygroceries.routes.orderRoutes
+import com.safetymarcus.mygroceries.routes.productRoutes
 import com.safetymarcus.mygroceries.server.db.Database
-import com.safetymarcus.mygroceries.routes.*
-import com.safetymarcus.mygroceries.db.*
-import com.safetymarcus.mygroceries.service.*
-import com.safetymarcus.mygroceries.model.*
-import com.safetymarcus.mygroceries.validators.*
+import com.safetymarcus.mygroceries.service.CategoryService
+import com.safetymarcus.mygroceries.service.LineItemService
+import com.safetymarcus.mygroceries.service.OrderService
+import com.safetymarcus.mygroceries.service.ProductService
+import com.safetymarcus.mygroceries.service.result
+import com.safetymarcus.mygroceries.validators.validate
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.cio.Request
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.application.log
-import io.ktor.server.config.ApplicationConfigurationException
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.server.response.respondText
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
+import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import io.ktor.server.util.getValue
+import kotlinx.serialization.json.Json
 
 fun main() {
     embeddedServer(
@@ -44,6 +56,14 @@ fun Application.configureDatabases() {
 
 fun Application.module() {
     configureDatabases()
+    install(CORS) {
+        allowHost("localhost:8080", schemes = listOf("http", "https"))
+        allowHeader(HttpHeaders.ContentType)
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Patch)
+        allowMethod(HttpMethod.Delete)
+    }
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
@@ -54,13 +74,16 @@ fun Application.module() {
         exception<RequestValidationException> { call, cause ->
             call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
         }
+        exception<Throwable> { call, cause ->
+            call.respond(HttpStatusCode.InternalServerError, "Internal Server Error: ${cause.localizedMessage}")
+        }
     }
-    
+
     val categoryService = CategoryService(CategoryRepository)
     val productService = ProductService(ProductRepository)
     val orderService = OrderService(OrderRepository)
     val lineItemService = LineItemService(LineItemRepository)
-    
+
     validations()
     categories(categoryService)
     products(productService, categoryService)
@@ -108,7 +131,11 @@ fun Application.orders(orderService: OrderService) {
     }
 }
 
-fun Application.lineItems(lineItemService: LineItemService, productService: ProductService, orderService: OrderService) {
+fun Application.lineItems(
+    lineItemService: LineItemService,
+    productService: ProductService,
+    orderService: OrderService
+) {
     routing {
         lineItemRoutes(lineItemService, productService, orderService)
     }

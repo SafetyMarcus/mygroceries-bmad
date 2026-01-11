@@ -15,30 +15,31 @@ repositories {
 
 dependencies {
     implementation(project(":shared"))
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-request-validation-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-server-status-pages-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty.jvm)
+    implementation(libs.ktor.server.cors.jvm)
+    implementation(libs.ktor.server.content.negotiation.jvm)
+    implementation(libs.ktor.server.request.validation.jvm)
+    implementation(libs.ktor.server.status.pages.jvm)
+    implementation(libs.ktor.serialization.kotlinx.json.jvm)
+    implementation(libs.logback.classic)
 
     // Exposed for database access
-    implementation(platform("org.jetbrains.exposed:exposed-bom:$exposedVersion"))
-    implementation("org.jetbrains.exposed:exposed-core")
-    implementation("org.jetbrains.exposed:exposed-dao")
-    implementation("org.jetbrains.exposed:exposed-jdbc")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
+    implementation(platform(libs.exposed.bom))
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.dao)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.kotlin.datetime)
 
     // HikariCP for connection pooling
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation(libs.hikaricp)
 
     // PostgreSQL driver
-    implementation("org.postgresql:postgresql:42.7.1")
+    implementation(libs.postgresql)
 
     // Flyway for database migrations
-    implementation("org.flywaydb:flyway-core:10.15.0")
-    implementation("org.flywaydb:flyway-database-postgresql:10.15.0")
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.database.postgresql)
 
     testImplementation("io.mockk:mockk:1.13.10")
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")

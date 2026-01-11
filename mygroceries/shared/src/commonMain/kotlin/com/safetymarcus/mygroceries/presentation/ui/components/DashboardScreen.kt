@@ -3,27 +3,28 @@ package com.safetymarcus.mygroceries.presentation.ui.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.safetymarcus.mygroceries.model.CategorySpending
-import kotlin.uuid.Uuid
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.safetymarcus.mygroceries.presentation.GroceriesViewModel
+import com.safetymarcus.mygroceries.presentation.UiState
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(viewModel: GroceriesViewModel = koinViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CategorySpendingChart(
-            state = CategorySpendingState.Success(
-                data = listOf(
-                    CategorySpending(Uuid.random(), "Produce", 30.0),
-                    CategorySpending(Uuid.random(), "Dairy", 20.0),
-                    CategorySpending(Uuid.random(), "Meat", 15.0),
-                    CategorySpending(Uuid.random(), "Bakery", 10.0),
-                    CategorySpending(Uuid.random(), "Other", 25.0)
-                )
-            )
-        )
+        val spendingState = when (val spending = uiState.spending) {
+            is UiState.Loading -> CategorySpendingState.Loading
+            is UiState.Error -> CategorySpendingState.Error(spending.message)
+            is UiState.Success -> CategorySpendingState.Success(spending.data)
+        }
+
+        CategorySpendingChart(state = spendingState)
     }
 }

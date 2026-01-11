@@ -16,7 +16,7 @@ kotlin {
     android {
         compilerOptions {
             namespace = "com.safetymarcus.mygroceries.shared"
-            compileSdk = 34
+            compileSdk = 35
             minSdk = 24
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         }
@@ -52,11 +52,14 @@ kotlin {
             api(libs.navigation.compose)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.koin.core) // Koin core is multiplatform
+            api(libs.koin.core) // Changed to api because it's exposed via initKoin()
+            implementation(libs.koin.compose.viewmodel)
             implementation(libs.kotlinx.datetime)
             implementation(compose.material3)
             implementation(libs.koala.core)
+            implementation(libs.lifecycle.runtime.compose)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
