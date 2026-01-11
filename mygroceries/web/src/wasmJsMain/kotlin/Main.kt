@@ -4,11 +4,13 @@ import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation.ExperimentalBrowserHistoryApi
 import androidx.navigation.bindToBrowserNavigation
 import androidx.navigation.compose.rememberNavController
+import com.safetymarcus.mygroceries.di.initKoin
 import com.safetymarcus.mygroceries.presentation.ui.MainView
 import org.jetbrains.compose.resources.configureWebResources
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalBrowserHistoryApi::class)
 fun main() {
+    initKoin()
     configureWebResources {
         resourcePathMapping { path -> "./$path" }
     }

@@ -34,16 +34,14 @@ sealed class CategorySpendingState {
 
 @OptIn(ExperimentalKoalaPlotApi::class)
 @Composable
-fun CategorySpendingChart(state: CategorySpendingState) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when (state) {
-            is CategorySpendingState.Loading -> CircularProgressIndicator()
-            is CategorySpendingState.Error -> Error(state)
-            is CategorySpendingState.Success -> CategoriesChart(state)
-        }
+fun CategorySpendingChart(state: CategorySpendingState) = Box(
+    modifier = Modifier.fillMaxSize(),
+    contentAlignment = Alignment.Center
+) {
+    when (state) {
+        is CategorySpendingState.Loading -> CircularProgressIndicator()
+        is CategorySpendingState.Error -> Error(state)
+        is CategorySpendingState.Success -> CategoriesChart(state)
     }
 }
 

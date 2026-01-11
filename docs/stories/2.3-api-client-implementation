@@ -1,0 +1,35 @@
+# 2.3: API Client Implementation
+
+**As a** developer,
+**I want** a client-side API service that can communicate with the backend,
+**so that** the UI modules can fetch the data they need to display.
+
+## Status
+Done
+
+## Acceptance Criteria
+
+1. A Ktor-based HTTP client is configured within the `shared` module.
+2. Client-side functions are implemented to call all the `GET` endpoints defined in Epic 1 (e.g., `GET /orders`, `GET /categories`, `GET /products`).
+3. The client correctly deserializes the JSON responses from the server into the shared data classes.
+4. Basic error handling is implemented to manage network issues or unsuccessful API responses.
+5. The API client is usable from all target platforms (web, Android, iOS).
+6. A Repository class is created that wraps all API calls and handles data transformation.
+7. A ViewModel class is implemented that uses the Repository to fetch and manage data.
+8. The ViewModel exposes data as reactive streams (StateFlow/Flow) for the UI to observe.
+9. The ViewModel handles loading states, error states, and data caching appropriately.
+
+## Technical Notes
+
+- Use Ktor client for HTTP communication
+- Implement proper serialization/deserialization with kotlinx.serialization
+- Create a centralized API service class for all endpoint calls
+- Include retry logic for transient network failures
+- Add logging for debugging API calls
+- Ensure the client follows the same data models as the backend
+- Handle different HTTP status codes appropriately
+- Implement a Repository pattern that wraps all API calls
+- ViewModels should interact with Repositories, not directly with the API client
+- Follow MVVM architecture: View -> ViewModel -> Repository -> API Client
+- Repositories should handle data transformation and business logic
+- ViewModels should expose data as StateFlow or similar reactive streams

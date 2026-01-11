@@ -1,34 +1,33 @@
 package com.safetymarcus.mygroceries.server
 
-import com.safetymarcus.mygroceries.server.db.Database
-import com.safetymarcus.mygroceries.routes.*
-import com.safetymarcus.mygroceries.db.*
-import com.safetymarcus.mygroceries.service.*
+import com.safetymarcus.mygroceries.db.CategoryRepository
+import com.safetymarcus.mygroceries.db.CategorySpendingRepository
+import com.safetymarcus.mygroceries.db.LineItemRepository
+import com.safetymarcus.mygroceries.db.OrderRepository
+import com.safetymarcus.mygroceries.db.ProductRepository
 import com.safetymarcus.mygroceries.model.*
-import com.safetymarcus.mygroceries.validators.*
+import com.safetymarcus.mygroceries.routes.*
+import com.safetymarcus.mygroceries.server.db.Database
+import com.safetymarcus.mygroceries.service.*
+import com.safetymarcus.mygroceries.validators.validate
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.cio.Request
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.application.log
-import io.ktor.server.config.ApplicationConfigurationException
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.server.response.respondText
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.requestvalidation.RequestValidation
+import io.ktor.server.plugins.requestvalidation.RequestValidationException
+import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
-import io.ktor.server.application.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.plugins.statuspages.*
-import io.ktor.server.request.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import io.ktor.server.util.getValue
+import kotlinx.serialization.json.Json
 
 fun main() {
     embeddedServer(
@@ -44,6 +43,14 @@ fun Application.configureDatabases() {
 
 fun Application.module() {
     configureDatabases()
+    install(CORS) {
+        allowHost("localhost:8080", schemes = listOf("http", "https"))
+        allowHeader(HttpHeaders.ContentType)
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Patch)
+        allowMethod(HttpMethod.Delete)
+    }
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
@@ -54,18 +61,20 @@ fun Application.module() {
         exception<RequestValidationException> { call, cause ->
             call.respond(HttpStatusCode.BadRequest, cause.reasons.joinToString())
         }
-    }
-    
+    }   
+
     val categoryService = CategoryService(CategoryRepository)
     val productService = ProductService(ProductRepository)
     val orderService = OrderService(OrderRepository)
     val lineItemService = LineItemService(LineItemRepository)
-    
+    val spendingService = SpendingService(CategorySpendingRepository)
+
     validations()
     categories(categoryService)
     products(productService, categoryService)
     orders(orderService)
     lineItems(lineItemService, productService, orderService)
+    spending(spendingService)
     health()
 }
 
@@ -108,8 +117,18 @@ fun Application.orders(orderService: OrderService) {
     }
 }
 
-fun Application.lineItems(lineItemService: LineItemService, productService: ProductService, orderService: OrderService) {
+fun Application.lineItems(
+    lineItemService: LineItemService,
+    productService: ProductService,
+    orderService: OrderService
+) {
     routing {
         lineItemRoutes(lineItemService, productService, orderService)
+    }
+}
+
+fun Application.spending(spendingService: SpendingService) {
+    routing {
+        spendingRoutes(spendingService)
     }
 }
