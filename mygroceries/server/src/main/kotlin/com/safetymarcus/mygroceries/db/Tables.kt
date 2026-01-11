@@ -32,3 +32,9 @@ object LineItems : Table("line_items") {
     
     override val primaryKey = PrimaryKey(id)
 }
+
+object CategorySpendingView : Table("category_spending") {
+    val categoryId = uuid("category_id")
+    val categoryName = varchar("category_name", 255)
+    val totalSpentCents = integer("total_spent_cents")
+}

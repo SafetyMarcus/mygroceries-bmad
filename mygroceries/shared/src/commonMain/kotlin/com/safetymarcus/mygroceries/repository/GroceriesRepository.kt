@@ -17,6 +17,8 @@ interface GroceriesRepository {
     suspend fun createOrder(order: NewOrder): Result<Order>
 
     fun getLineItems(orderId: Uuid): Flow<Result<List<LineItem>>>
+    
+    fun getCategorySpending(): Flow<Result<List<CategorySpending>>>
 }
 
 class GroceriesRepositoryImpl(private val api: GroceriesApi) : GroceriesRepository {
@@ -72,6 +74,14 @@ class GroceriesRepositoryImpl(private val api: GroceriesApi) : GroceriesReposito
     override fun getLineItems(orderId: Uuid): Flow<Result<List<LineItem>>> = flow {
         try {
             emit(Result.success(api.getLineItems(orderId)))
+        } catch (e: Exception) {
+            emit(Result.failure(e))
+        }
+    }
+
+    override fun getCategorySpending(): Flow<Result<List<CategorySpending>>> = flow {
+        try {
+            emit(Result.success(api.getCategorySpending()))
         } catch (e: Exception) {
             emit(Result.failure(e))
         }

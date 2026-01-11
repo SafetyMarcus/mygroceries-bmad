@@ -60,6 +60,9 @@ class GroceriesApi(private val client: HttpClient) {
         contentType(ContentType.Application.Json)
     }.body()
 
+    // Spending Endpoints
+    suspend fun getCategorySpending(): List<CategorySpending> = client.get("spending/categories").body()
+
     companion object {
         fun createClient(baseUrl: String): HttpClient {
             return HttpClient {

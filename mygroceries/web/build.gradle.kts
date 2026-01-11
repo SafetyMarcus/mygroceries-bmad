@@ -44,3 +44,7 @@ kotlin {
         }
     }
 }
+
+tasks.named("wasmJsBrowserDevelopmentRun") {
+    dependsOn("wasmJsProductionExecutableCompileSync")
+}

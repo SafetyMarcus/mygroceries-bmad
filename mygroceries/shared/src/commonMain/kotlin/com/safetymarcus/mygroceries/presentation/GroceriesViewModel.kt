@@ -33,8 +33,7 @@ class GroceriesViewModel(private val repository: GroceriesRepository) : ViewMode
         fetchCategories()
         fetchProducts()
         fetchOrders()
-        // Initialize spending as empty success for now to satisfy the UI
-        _uiState.update { it.copy(spending = UiState.Success(emptyList())) }
+        fetchSpending()
     }
 
     fun fetchCategories() {
@@ -70,6 +69,19 @@ class GroceriesViewModel(private val repository: GroceriesRepository) : ViewMode
                 _uiState.update { state ->
                     state.copy(
                         orders = result.toUiState()
+                    )
+                }
+            }
+        }
+    }
+
+    fun fetchSpending() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(spending = UiState.Loading) }
+            repository.getCategorySpending().collect { result ->
+                _uiState.update { state ->
+                    state.copy(
+                        spending = result.toUiState()
                     )
                 }
             }

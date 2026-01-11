@@ -1,27 +1,14 @@
 package com.safetymarcus.mygroceries.server
 
 import com.safetymarcus.mygroceries.db.CategoryRepository
+import com.safetymarcus.mygroceries.db.CategorySpendingRepository
 import com.safetymarcus.mygroceries.db.LineItemRepository
 import com.safetymarcus.mygroceries.db.OrderRepository
 import com.safetymarcus.mygroceries.db.ProductRepository
-import com.safetymarcus.mygroceries.model.Category
-import com.safetymarcus.mygroceries.model.LineItem
-import com.safetymarcus.mygroceries.model.NewCategory
-import com.safetymarcus.mygroceries.model.NewLineItem
-import com.safetymarcus.mygroceries.model.NewOrder
-import com.safetymarcus.mygroceries.model.NewProduct
-import com.safetymarcus.mygroceries.model.Order
-import com.safetymarcus.mygroceries.model.Product
-import com.safetymarcus.mygroceries.routes.categoryRoutes
-import com.safetymarcus.mygroceries.routes.lineItemRoutes
-import com.safetymarcus.mygroceries.routes.orderRoutes
-import com.safetymarcus.mygroceries.routes.productRoutes
+import com.safetymarcus.mygroceries.model.*
+import com.safetymarcus.mygroceries.routes.*
 import com.safetymarcus.mygroceries.server.db.Database
-import com.safetymarcus.mygroceries.service.CategoryService
-import com.safetymarcus.mygroceries.service.LineItemService
-import com.safetymarcus.mygroceries.service.OrderService
-import com.safetymarcus.mygroceries.service.ProductService
-import com.safetymarcus.mygroceries.service.result
+import com.safetymarcus.mygroceries.service.*
 import com.safetymarcus.mygroceries.validators.validate
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -83,12 +70,14 @@ fun Application.module() {
     val productService = ProductService(ProductRepository)
     val orderService = OrderService(OrderRepository)
     val lineItemService = LineItemService(LineItemRepository)
+    val spendingService = SpendingService(CategorySpendingRepository)
 
     validations()
     categories(categoryService)
     products(productService, categoryService)
     orders(orderService)
     lineItems(lineItemService, productService, orderService)
+    spending(spendingService)
     health()
 }
 
@@ -138,5 +127,11 @@ fun Application.lineItems(
 ) {
     routing {
         lineItemRoutes(lineItemService, productService, orderService)
+    }
+}
+
+fun Application.spending(spendingService: SpendingService) {
+    routing {
+        spendingRoutes(spendingService)
     }
 }
